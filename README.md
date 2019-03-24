@@ -4,6 +4,7 @@ Scrypt para instalação do cyberpanel mais alguns utilitários para configurar 
 Script em construção:
 
 Itens que serão integrados ao script
+
 [github Issues](https://github.com/juanpvh/cyber-install/issues/1)
 
 vamos la!
