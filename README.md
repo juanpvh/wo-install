@@ -1,5 +1,5 @@
 # WO Install
-Scrypt para instalação do WordOps com o script wo-nginx-setup de Virtubox mais alguns utilitários para configurar seu servidor.
+Script para instalação do WordOps com o script wo-nginx-setup de Virtubox mais alguns utilitários para configurar seu servidor.
 
 Script em construção:
 
