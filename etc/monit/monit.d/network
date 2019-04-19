@@ -1,0 +1,7 @@
+## Network
+check network eth0 with interface eth0
+  start program = "/sbin/ifup eth0"
+  stop program = "/sbin/ifdown eth0"
+  if failed link then restart
+  if failed link then alert
+  if changed link then alert
