@@ -320,13 +320,13 @@ export HISTSIZE=10000
 # clone repository
 ##################################
 echo "###########################################"
-echo " Cloning Ubuntu-nginx-web-server repository"
+echo " Cloning wo-install repository"
 echo "###########################################"
 
-if [ ! -d $HOME/ubuntu-nginx-web-server ]; then
-    git clone https://github.com/VirtuBox/ubuntu-nginx-web-server.git $HOME/ubuntu-nginx-web-server
+if [ ! -d $HOME/wo-install ]; then
+    git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install
 else
-    git -C $HOME/ubuntu-nginx-web-server pull origin master
+    git -C $HOME/wo-install pull origin master
 fi
 
 ##################################
@@ -337,7 +337,7 @@ fi
 CURRENT_SSH_PORT=$(grep "Port" /etc/ssh/sshd_config | awk -F " " '{print $2}')
 
 # download secure sshd_config
-sudo cp -f $HOME/ubuntu-nginx-web-server/etc/ssh/sshd_config /etc/ssh/sshd_config
+sudo cp -f $HOME/wo-install/etc/ssh/sshd_config /etc/ssh/sshd_config
 
 # change ssh default port
 sudo sed -i "s/Port 22/Port $CURRENT_SSH_PORT/" /etc/ssh/sshd_config
@@ -404,8 +404,8 @@ echo "##########################################"
 echo " Applying Linux Kernel tweaks"
 echo "##########################################"
 
-sudo cp -f $HOME/ubuntu-nginx-web-server/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
-sudo cp -f $HOME/ubuntu-nginx-web-server/etc/security/limits.conf /etc/security/limits.conf
+sudo cp -f $HOME/wo-install/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+sudo cp -f $HOME/wo-install/etc/security/limits.conf /etc/security/limits.conf
 
 # Redis transparent_hugepage
 echo never >/sys/kernel/mm/transparent_hugepage/enabled
@@ -506,7 +506,7 @@ if [ "$MARIADB_SERVER_INSTALL" = "y" ]; then
         echo " Optimizing MariaDB configuration"
         echo "##########################################"
 
-        cp -f $HOME/ubuntu-nginx-web-server/etc/mysql/my.cnf /etc/mysql/my.cnf
+        cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
 
         # stop mysql service to apply new InnoDB log file size
         sudo service mysql stop
@@ -516,7 +516,7 @@ if [ "$MARIADB_SERVER_INSTALL" = "y" ]; then
         sudo mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
 
         # increase mariadb open_files_limit
-        cp -f $HOME/ubuntu-nginx-web-server/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
+        cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
 
         # reload daemon
         systemctl daemon-reload
@@ -600,8 +600,8 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     fi
     if [ ! -f /var/www/.profile ] && [ ! -f /var/www/.bashrc ]; then
         # create .profile & .bashrc for www-data user
-        cp -f $HOME/ubuntu-nginx-web-server/var/www/.profile /var/www/.profile
-        cp -f $HOME/ubuntu-nginx-web-server/var/www/.bashrc /var/www/.bashrc
+        cp -f $HOME/wo-install/var/www/.profile /var/www/.profile
+        cp -f $HOME/wo-install/var/www/.bashrc /var/www/.bashrc
 
         # set www-data as owner
         sudo chown www-data:www-data /var/www/.profile
@@ -634,7 +634,7 @@ echo "##########################################"
 git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
 
 # optimized nginx.config
-cp -f $HOME/ubuntu-nginx-web-server/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # reduce nginx logs rotation
 sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
@@ -671,8 +671,8 @@ echo "##########################################"
 echo " Configuring Fail2Ban"
 echo "##########################################"
 
-cp -rf $HOME/ubuntu-nginx-web-server/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
-cp -rf $HOME/ubuntu-nginx-web-server/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
+cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
+cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
 
 fail2ban-client reload
 
@@ -727,12 +727,12 @@ if [ $MONIT_INSTALL = "y" ]; then
 	mkdir /etc/monit/monit.d/
 	mkdir /etc/monit/conf-enable/
 	cd ~
-	cp -rf $HOME/ubuntu-nginx-web-server/etc/monitrc /etc/
+	cp -rf $HOME/wo-install/etc/monitrc /etc/
 	chmod 0600 /etc/monitrc
 	ln -s /etc/monitrc /etc/monit/monitrc
 #regras
-	cp -rf $HOME/ubuntu-nginx-web-server/etc/monit/monit.d/* /etc/monit/monit.d/
-	cp -rf $PWD/ubuntu-nginx-web-server/etc/monit.service /lib/systemd/system/monit.service
+	cp -rf $HOME/wo-install/etc/monit/monit.d/* /etc/monit/monit.d/
+	cp -rf $PWD/wo-install/etc/monit.service /lib/systemd/system/monit.service
 	systemctl enable monit
 
 #linkar
@@ -870,8 +870,8 @@ fi
 ##################################
 # Install Image optimization bash script
 ##################################
-sudo cp $HOME/ubuntu-nginx-web-server/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
-sydo cp $HOME/ubuntu-nginx-web-server/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
+sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
+sydo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
 chmod + x /etc/cron.weekly/jpg-png-cron
 
 
