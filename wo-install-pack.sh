@@ -10,7 +10,7 @@
 # Version 1.0 - 2019-02-19
 # -------------------------------------------------------------------------
 
-CSI='\033['
+CSI="\033["
 CEND="${CSI}0m"
 CGREEN="${CSI}1;32m"
 
@@ -334,7 +334,7 @@ fi
 ##################################
 
 # get current ssh port
-CURRENT_SSH_PORT=$(grep "Port" /etc/ssh/sshd_config | awk -F " " '{print $2}')
+CURRENT_SSH_PORT=$(grep "#Port" /etc/ssh/sshd_config | awk -F " " '{print $2}')
 
 # download secure sshd_config
 sudo cp -f $HOME/wo-install/etc/ssh/sshd_config /etc/ssh/sshd_config
