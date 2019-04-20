@@ -617,7 +617,7 @@ echo "##########################################"
 echo " Compiling Nginx with nginx-ee"
 echo "##########################################"
 
-wget -O $HOME/nginx-build.sh https://virtubox.net/nginx-ee
+wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
 chmod +x $HOME/nginx-build.sh
 
 $HOME/nginx-build.sh
@@ -630,11 +630,12 @@ echo "##########################################"
 echo " Configuring Nginx"
 echo "##########################################"
 
+# optimized nginx.config
+cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+
 # commit changes
 git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
 
-# optimized nginx.config
-cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # reduce nginx logs rotation
 sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
