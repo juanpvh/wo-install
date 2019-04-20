@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # -------------------------------------------------------------------------
-#  WO-NGINX-SETUP - automated WordOps server setup script
+#  WO-INSTALL-PACK - automated WordOps server setup script
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
+# FORKED
 # GitHub:        https://github.com/VirtuBox/ee-nginx-setup
-# Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
 # Version 1.0 - 2019-02-19
