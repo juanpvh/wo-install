@@ -231,7 +231,7 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
             read -p "Select an option [y/n]: " 	RKHUNTER_INSTALL
         done
 		
-    f	
+    fi	
 	
 	
     echo ""
