@@ -102,9 +102,6 @@ else
                 --travis)
                     TRAVIS_BUILD="y"
                 ;;
-                --hostname)
-                    HOSTNAME_BUILD="y"
-                ;;
                 -h|--help)
                     _help
                     exit 1
@@ -140,17 +137,6 @@ echo ""
 
 if [ "$INTERACTIVE_SETUP" = "y" ]; then
 
-    if [ -f /etc/hostname ]; then
-        echo ""
-        echo "#####################################"
-        echo "HOSTNAME"
-        echo "#####################################"
-        echo "Do you want Configure Hostname ? (y/n)"
-        while [[ $HOSTNAME_BUILD != "y" && $HOSTNAME_BUILD != "n" ]]; do
-            read -p "Enter an FQDN Valid, DNS records must have been appended and propagated [fqdn.domain.tld]: " HOSTNAME_INSTALL
-        hostname $HOSTNAME_INSTALL   
-        done
-    fi
 	
     if [ -z "$(command -v mysqladmin)" ]; then
         echo "#####################################"
@@ -628,7 +614,7 @@ echo "##########################################"
 echo " Compiling Nginx with nginx-ee"
 echo "##########################################"
 
-wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
+wget -O $HOME/nginx-build.sh https://virtubox.net/nginx-ee
 chmod +x $HOME/nginx-build.sh
 
 $HOME/nginx-build.sh
@@ -842,6 +828,8 @@ if [ "$WO_DASHBOARD_INSTALL" = "y" ]; then
     echo "##########################################"
     echo " Installing EasyEngine Dashboard"
     echo "##########################################"
+
+
 
     if [ ! -d /var/www/22222/htdocs/files ]; then
 
