@@ -10,7 +10,7 @@
 # Version 1.0 - 2019-02-19
 # -------------------------------------------------------------------------
 
-CSI="\033["
+CSI='\033['
 CEND="${CSI}0m"
 CGREEN="${CSI}1;32m"
 
@@ -194,7 +194,7 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         while [[ $CLAMAV_INSTALL != "y" && $CLAMAV_INSTALL != "n" ]]; do
             read -p "Select an option [y/n]: " CLAMAV_INSTALL
         done
-		
+	fi	
     if [ -z "$(command -v monit)" ]; then
         echo ""
         echo "#####################################"
@@ -204,10 +204,8 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         while [[ $MONIT_INSTALL != "y" && $MONIT_INSTALL != "n" ]]; do
             read -p "Select an option [y/n]: " 	MONIT_INSTALL
         done
-		
-    fi
-	
-    if [ -z "$(command -v rkhunter)" ]; then
+	fi
+	if [ -z "$(command -v rkhunter)" ]; then
         echo ""
         echo "#####################################"
         echo "FTP"
@@ -216,10 +214,8 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         while [[ $RKHUNER_INSTALL != "y" && $RKHUNTER_INSTALL != "n" ]]; do
             read -p "Select an option [y/n]: " 	RKHUNTER_INSTALL
         done
+	fi	
 		
-    fi	
-	
-	
     echo ""
     echo "#####################################"
     echo "FTP"
