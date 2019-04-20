@@ -9,5 +9,11 @@ Itens que serão integrados ao script
 
 vamos la!
 
+### Instalando:
+
+```
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-install-pack.sh && chmod +x wo-install-pack.sh && clear && ./wo-install-pack.sh
+```
+
 
 
