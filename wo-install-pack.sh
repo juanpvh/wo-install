@@ -397,6 +397,16 @@ sudo ufw allow 22222
 sudo ufw allow 19999
 
 ##################################
+# WordPress installation locale
+##################################
+
+echo "##########################################"
+echo " Customize WordPress installation locale"
+echo "##########################################"
+
+sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
+
+##################################
 # Sysctl tweaks +  open_files limits
 ##################################
 
@@ -582,7 +592,7 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     echo "##########################################"
 
         /usr/local/bin/wo stack install
-#		/usr/local/bin/wo stack install --all
+
 
     ##################################
     # Allow www-data shell access for SFTP + add .bashrc settings et completion
@@ -742,7 +752,7 @@ if [ $MONIT_INSTALL = "y" ]; then
 	monit reload
 	
     fi
-	
+fi	
 	
 if [ $RKHUNTER_INSTALL = "y" ]; then
 
@@ -771,7 +781,7 @@ if [ $RKHUNTER_INSTALL = "y" ]; then
 	rkhunter --check --sk
 	
     fi
-
+fi
 
 ##################################
 # Install nanorc & mysqldump script
@@ -832,12 +842,10 @@ if [ "$WO_DASHBOARD_INSTALL" = "y" ]; then
     echo " Installing EasyEngine Dashboard"
     echo "##########################################"
 
-
-
     if [ ! -d /var/www/22222/htdocs/files ]; then
 
         mkdir -p /var/www/22222/htdocs/files
-        wget -qO /var/www/22222/htdocs/files/ex.zip http://extplorer.net/attachments/download/74/eXtplorer_$EXTPLORER_VER.zip
+        wget -qO /var/www/22222/htdocs/files/ex.zip https://extplorer.net/attachments/78/eXtplorer_2.1.12.zip
         cd /var/www/22222/htdocs/files || exit 1
         unzip ex.zip
         rm ex.zip
@@ -845,26 +853,14 @@ if [ "$WO_DASHBOARD_INSTALL" = "y" ]; then
 
     cd /var/www/22222 || exit
 
-    ## download latest version of EasyEngine-dashboard
+    ## download latest version of Wordops-dashboard
     cd /tmp || exit
-    git clone https://github.com/VirtuBox/easyengine-dashboard.git
-    cp -rf /tmp/easyengine-dashboard/* /var/www/22222/htdocs/
+    git clone https://github.com/WordOps/wordops-dashboard.git
+    cp -rf /tmp/wordops-dashboard/* /var/www/22222/htdocs/
+    mv /tmp/wordops-dashboard/.gitignore /var/www/22222/htdocs/.gitignore
+    mv /tmp/wordops-dashboard/.git /var/www/22222/htdocs/.git
     chown -R www-data:www-data /var/www/22222/htdocs
-
-fi
-
-##################################
-# Install cheat.sh
-##################################
-
-if [ -z "$(command -v cht.sh)" ]; then
-    echo "##########################################"
-    echo " Installing cheat.sh"
-    echo "##########################################"
-
-    curl https://cht.sh/:cht.sh > /usr/local/bin/cht.sh || wget -qO  /usr/local/bin/cht.sh https://cht.sh/:cht.sh
-    chmod +x /usr/local/bin/cht.sh
-    echo 'alias cheat="cht.sh"' >> $HOME/.bashrc
+    rm -rf /tmp/wordops-dashboard
 
 fi
 
