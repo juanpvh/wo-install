@@ -842,11 +842,11 @@ chmod + x /etc/cron.weekly/jpg-png-cron
 ##################################
 # create a database user called “netdata”
 ##################################
-mysql -u root -p
-CREATE USER 'netdata'@'localhost';
-GRANT USAGE on *.* to 'netdata'@'localhost';
-FLUSH PRIVILEGES;
-exit
+#mysql -u root -p
+#CREATE USER 'netdata'@'localhost';
+#GRANT USAGE on *.* to 'netdata'@'localhost';
+#FLUSH PRIVILEGES;
+#exit
 
 ## optimize netdata resources usage
 echo 1 >/sys/kernel/mm/ksm/run
