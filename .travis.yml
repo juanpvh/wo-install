@@ -24,4 +24,3 @@ script:
   - sudo nginx -t
   - sudo chown -R travis /usr/local/src
   - sudo chmod 755 /usr/local/src
-  
