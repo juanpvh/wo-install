@@ -37,7 +37,8 @@ MARIADB_SERVER_INSTALL="y"
 
 [ -z "$(command -v sudo)" ] && { apt-get -y install sudo >>/dev/null 2>&1; }
 [ -z "$(command -v curl)" ] && { apt-get -y install curl >>/dev/null 2>&1; }
-
+[ -z "$(command -v monit)" ] && { apt-get -y autoremove monit --purge >>/dev/null 2>&1; }
+rm -rf /etc/monit/
 
 
 ##################################
@@ -689,9 +690,7 @@ if [ "$MONIT_INSTALL" = "y" ]; then
     echo "##########################################"
 
     if [ -z "$(command -v monit)" ]; then
-	apt-get remove monit -y
-	apt-get --purge remove monit -y
-	rm -rf /etc/monit/
+
 	apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev autoconf bison libpam0g-dev
 	cd ~
 	wget https://mmonit.com/monit/dist/monit-5.25.2.tar.gz
