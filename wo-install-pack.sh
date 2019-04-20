@@ -278,7 +278,7 @@ echo "##########################################"
 
 #adicionar swap
 
-fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
+#fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
 
 ##################################
 # Useful packages
@@ -852,7 +852,7 @@ fi
 # Install Image optimization bash script
 ##################################
 sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
-sydo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
+sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
 chmod + x /etc/cron.weekly/jpg-png-cron
 
 
@@ -869,7 +869,9 @@ if [ "$EE_CLEANUP" = "y" ]; then
     apt-get -y autoremove php7.0-fpm php7.0-common --purge
     apt-get -y autoremove php7.1-fpm php7.1-common --purge
 fi
-
 echo " "
 echo " Optimized Wordops was setup successfully! "
+echo " Dashboard https://IP_ANDRESS OR dominio.tld:22222"
+echo " Dashboard https://IP_ANDRESS OR dominio.tld/netdata"
+echo " Dashboard https://IP_ANDRESS OR dominio.tld/monit"
 echo " "
