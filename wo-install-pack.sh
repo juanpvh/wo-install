@@ -881,12 +881,6 @@ if [ "$EE_CLEANUP" = "y" ]; then
     echo " Cleaning up previous EasyEngine installation"
     echo "##########################################"
 
-    tar -I pigz -cvf $HOME/ee-backup.tar.gz /etc/ee /var/lib/ee /usr/lib/ee/templates
-    echo "Backup of the previous EasyEngine configurations is available here : $HOME/ee-backup.tar.gz"
-
-    rm -rf /etc/ee /var/lib/ee /usr/lib/ee /usr/local/bin/ee /etc/bash_completion.d/ee_auto.rc
-    rm -rf /usr/local/lib/python3.6/dist-packages/ee-3.*
-
     apt-get -y autoremove php5.6-fpm php5.6-common --purge
     apt-get -y autoremove php7.0-fpm php7.0-common --purge
     apt-get -y autoremove php7.1-fpm php7.1-common --purge
