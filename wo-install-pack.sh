@@ -364,15 +364,6 @@ sudo ufw allow 22222
 # Netdata web interface
 sudo ufw allow 19999
 
-##################################
-# WordPress installation locale
-##################################
-
-echo "##########################################"
-echo " Customize WordPress installation locale"
-echo "##########################################"
-
-sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
 
 ##################################
 # Sysctl tweaks +  open_files limits
@@ -538,9 +529,7 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
         echo " Installing WordOps"
         echo "##########################################"
 
-        wget -O wo https://raw.githubusercontent.com/WordOps/WordOps/master/install
-        chmod +x wo
-        ./wo
+        wget -qO wo wops.cc && sudo bash wo
         source /etc/bash_completion.d/wo_auto.rc
         rm wo
 
@@ -575,6 +564,17 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     if [ ! -f /etc/bash_completion.d/wp-completion.bash ]; then
         # download wp-cli bash-completion
         sudo wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
+    
+    ##################################
+    # WordPress installation locale
+    ##################################
+
+    echo "##########################################"
+    echo " Customize WordPress installation locale"
+    echo "##########################################"
+
+    sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
+
     fi
     if [ ! -f /var/www/.profile ] && [ ! -f /var/www/.bashrc ]; then
         # create .profile & .bashrc for www-data user
@@ -838,6 +838,23 @@ fi
 sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
 sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
 chmod + x /etc/cron.weekly/jpg-png-cron
+
+##################################
+# create a database user called “netdata”
+##################################
+mysql -u root -p
+CREATE USER 'netdata'@'localhost';
+GRANT USAGE on *.* to 'netdata'@'localhost';
+FLUSH PRIVILEGES;
+exit
+
+## optimize netdata resources usage
+echo 1 >/sys/kernel/mm/ksm/run
+echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
+
+## disable email notifigrep -cions
+sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /usr/lib/netdata/conf.d/health_alarm_notify.conf
+service netdata restart
 
 
 ##################################
