@@ -10,6 +10,7 @@ before_install:
   - rm -rf ~/.gnupg
 
 before_script:
+  - apt-get install sudo -y
   - sudo rm -rf /etc/mysql/
   - sudo apt-get -qq purge mysql* graphviz*
   - sudo apt-get -qq autoremove

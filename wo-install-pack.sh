@@ -18,7 +18,6 @@ CGREEN="${CSI}1;32m"
 # Variables
 ##################################
 
-EXTPLORER_VER="2.1.10"
 WO_DASHBOARD_INSTALL="y"
 MARIADB_SERVER_INSTALL="y"
 
@@ -875,6 +874,6 @@ if [ "$EE_CLEANUP" = "y" ]; then
     apt-get -y autoremove php7.1-fpm php7.1-common --purge
 fi
 
-echo ""
-echo -e "       ${CGREEN}Optimized Wordops was setup successfully !${CEND}"
-echo ""
+echo " "
+echo " Optimized Wordops was setup successfully! "
+echo " "
