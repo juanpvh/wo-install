@@ -311,21 +311,6 @@ else
     git -C $HOME/wo-install pull origin master
 fi
 
-##################################
-# Secure SSH server
-##################################
-
-# get current ssh port
-CURRENT_SSH_PORT=$(grep "#Port" /etc/ssh/sshd_config | awk -F " " '{print $2}')
-
-# download secure sshd_config
-sudo cp -f $HOME/wo-install/etc/ssh/sshd_config /etc/ssh/sshd_config
-
-# change ssh default port
-sudo sed -i "s/Port 22/Port $CURRENT_SSH_PORT/" /etc/ssh/sshd_config
-
-# restart ssh service
-sudo service ssh restart
 
 ##################################
 # ufw
