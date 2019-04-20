@@ -102,9 +102,9 @@ else
                 --travis)
                     TRAVIS_BUILD="y"
                 ;;
-#                --hostname)
-#                    HOSTNAME_BUILD="y"
-#                ;;
+                --hostname)
+                    HOSTNAME_BUILD="y"
+                ;;
                 -h|--help)
                     _help
                     exit 1
@@ -140,16 +140,17 @@ echo ""
 
 if [ "$INTERACTIVE_SETUP" = "y" ]; then
 
-#    if [ -f /etc/hostname ]; then
-#        echo ""
-#        echo "#####################################"
-#        echo "HOSTNAME"
-#        echo "#####################################"
-#        echo "Do you want Configure Hostname ? (y/n)"
-#        while [[ $HOSTNAME_INSTALL != "y" && $HOSTNAME_INSTALL != "n" ]]; do
-#            read -p "Enter an FQDN Valid, DNS records must have been appended and propagated [fqdn.domain.tld]: " HOSTNAME_INSTALL
-#        done
-#    fi
+    if [ -f /etc/hostname ]; then
+        echo ""
+        echo "#####################################"
+        echo "HOSTNAME"
+        echo "#####################################"
+        echo "Do you want Configure Hostname ? (y/n)"
+        while [[ $HOSTNAME_BUILD != "y" && $HOSTNAME_BUILD != "n" ]]; do
+            read -p "Enter an FQDN Valid, DNS records must have been appended and propagated [fqdn.domain.tld]: " HOSTNAME_INSTALL
+        hostname $HOSTNAME_INSTALL   
+        done
+    fi
 	
     if [ -z "$(command -v mysqladmin)" ]; then
         echo "#####################################"
