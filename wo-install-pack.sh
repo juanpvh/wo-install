@@ -45,8 +45,8 @@ MARIADB_SERVER_INSTALL="y"
 ##################################
 
 _help() {
-    echo "WO-NGINX-SETUP - automated WordOps server setup script"
-    echo "Usage: ./wo-nginx-setup.sh [options]"
+    echo "WO-INSTALL.PACK - automated WordOps server setup script"
+    echo "Usage: ./wo-install-pack.sh [options]"
     echo "  Options:"
     echo "       --remote-mysql ..... install mysql-client for remote mysql access"
     echo "       -i | --interactive ..... interactive installation mode"
@@ -117,7 +117,7 @@ fi
 ##################################
 
 echo ""
-echo "Welcome to Wo-Nginx-setup script."
+echo "Welcome to Wo-instal-pack script."
 echo ""
 
 [ -d /etc/ee ] && {
@@ -353,7 +353,7 @@ sudo ufw default deny incoming
 sudo ufw allow 22
 
 # custom ssh port
-if [ "$CURRENT_SSH_PORT" != "22" ];then
+if [ "$CURRENT_SSH_PORT" != "22" ]; then
     sudo ufw allow "$CURRENT_SSH_PORT"
 fi
 
@@ -673,7 +673,7 @@ cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
 
 fail2ban-client reload
 
-if [ $CLAMAV_INSTALL = "y" ]; then
+if [ "$CLAMAV_INSTALL" = "y" ]; then
 
     ##################################
     # Install ClamAV
@@ -698,7 +698,7 @@ if [ $CLAMAV_INSTALL = "y" ]; then
     /etc/init.d/clamav-freshclam start
 fi
 
-if [ $MONIT_INSTALL = "y" ]; then
+if [ "$MONIT_INSTALL" = "y" ]; then
 
     ##################################
     # Install Monit
@@ -740,7 +740,7 @@ if [ $MONIT_INSTALL = "y" ]; then
     fi
 fi	
 	
-if [ $RKHUNTER_INSTALL = "y" ]; then
+if [ "$RKHUNTER_INSTALL" = "y" ]; then
 
     ##################################
     # Install Rkhunter
