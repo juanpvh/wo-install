@@ -279,7 +279,7 @@ echo "##########################################"
 
 #adicionar swap
 
-#fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
+fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
 
 ##################################
 # Useful packages
@@ -549,6 +549,8 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     echo "##########################################"
 
         /usr/local/bin/wo stack install
+		/usr/local/bin/wo stack install --php73 --redis --admin --phpredisadmin
+		apt-get install -y php7.0-intl
 
 
     ##################################
@@ -595,7 +597,7 @@ echo "##########################################"
 echo " Compiling Nginx with nginx-ee"
 echo "##########################################"
 
-wget -O $HOME/nginx-build.sh https://virtubox.net/nginx-ee
+wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
 chmod +x $HOME/nginx-build.sh
 
 $HOME/nginx-build.sh
@@ -691,6 +693,8 @@ if [ "$MONIT_INSTALL" = "y" ]; then
 
     if [ -z "$(command -v monit)" ]; then
 
+    apt-get -y autoremove monit --purge
+    rm -rf /etc/monit/
 	apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev autoconf bison libpam0g-dev
 	cd ~
 	wget https://mmonit.com/monit/dist/monit-5.25.2.tar.gz
@@ -720,34 +724,34 @@ if [ "$MONIT_INSTALL" = "y" ]; then
     fi
 fi	
 	
-if [ "$RKHUNTER_INSTALL" = "y" ]; then
-
-    ##################################
-    # Install Rkhunter
-    ##################################
-    echo "##########################################"
-    echo " Installing Rkhunter"
-    echo "##########################################"
-
-    if [ -z "$(command -v rkhunter)" ]; then
-	
-	apt-get install rkhunter -y
-
-	sed -i 's/UPDATE_MIRRORS=0/UPDATE_MIRRORS=1/' /etc/rkhunter.conf
-	sed -i 's/MIRRORS_MODE=1/UPDATE_MIRRORS=0/' /etc/rkhunter.conf
-	sed -i 's/WEB_CMD="\/bin\/false"/WEB_CMD=""/' /etc/rkhunter.conf
-
-	sed -i 's/CRON_DAILY_RUN=""/CRON_DAILY_RUN="true"/' /etc/default/rkhunter
-	sed -i 's/CRON_DB_UPDATE=""/CRON_DB_UPDATE="true"/' /etc/default/rkhunter
-	sed -i 's/APT_AUTOGEN="false"/APT_AUTOGEN="true"/' /etc/default/rkhunter
-	rkhunter -C
-	rkhunter --update
-	rkhunter --versioncheck
-	rkhunter --propupd
-	rkhunter --check --sk
-	
-    fi
-fi
+#if [ "$RKHUNTER_INSTALL" = "y" ]; then
+#
+#    ##################################
+#    # Install Rkhunter
+#    ##################################
+#    echo "##########################################"
+#    echo " Installing Rkhunter"
+#    echo "##########################################"
+#
+#    if [ -z "$(command -v rkhunter)" ]; then
+#	
+#	apt-get install rkhunter -y
+#
+#	sed -i 's/UPDATE_MIRRORS=0/UPDATE_MIRRORS=1/' /etc/rkhunter.conf
+#	sed -i 's/MIRRORS_MODE=1/UPDATE_MIRRORS=0/' /etc/rkhunter.conf
+#	sed -i 's/WEB_CMD="\/bin\/false"/WEB_CMD=""/' /etc/rkhunter.conf
+#
+#	sed -i 's/CRON_DAILY_RUN=""/CRON_DAILY_RUN="true"/' /etc/default/rkhunter
+#	sed -i 's/CRON_DB_UPDATE=""/CRON_DB_UPDATE="true"/' /etc/default/rkhunter
+#	sed -i 's/APT_AUTOGEN="false"/APT_AUTOGEN="true"/' /etc/default/rkhunter
+#	rkhunter -C
+#	rkhunter --update
+#	rkhunter --versioncheck
+#	rkhunter --propupd
+#	rkhunter --check --sk
+#	
+#    fi
+#fi
 
 ##################################
 # Install nanorc & mysqldump script
@@ -837,16 +841,16 @@ fi
 ##################################
 sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
 sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
-chmod + x /etc/cron.weekly/jpg-png-cron
+chmod +x /etc/cron.weekly/jpg-png-cron
 
 ##################################
 # create a database user called “netdata”
 ##################################
-#mysql -u root -p
-#CREATE USER 'netdata'@'localhost';
-#GRANT USAGE on *.* to 'netdata'@'localhost';
-#FLUSH PRIVILEGES;
-#exit
+
+mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
+mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
+mysql -e "FLUSH PRIVILEGES"
+
 
 ## optimize netdata resources usage
 echo 1 >/sys/kernel/mm/ksm/run
@@ -869,10 +873,12 @@ if [ "$EE_CLEANUP" = "y" ]; then
     apt-get -y autoremove php5.6-fpm php5.6-common --purge
     apt-get -y autoremove php7.0-fpm php7.0-common --purge
     apt-get -y autoremove php7.1-fpm php7.1-common --purge
+    cd ~
 fi
+ADDRESS=$(hostname -I | awk '{ print $1}')
 echo " "
 echo " Optimized Wordops was setup successfully! "
-echo " Dashboard https://IP_ANDRESS OR dominio.tld:22222"
-echo " Dashboard https://IP_ANDRESS OR dominio.tld/netdata"
-echo " Dashboard https://IP_ANDRESS OR dominio.tld/monit"
+echo " Dashboard https://$ADDRESS:22222"
+echo " Dashboard https://$ADDRESS:22222/netdata"
+echo " Dashboard https://$ADDRESS:22222/monit"
 echo " "

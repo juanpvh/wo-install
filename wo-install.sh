@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # -------------------------------------------------------------------------
-#  WO-NGINX-SETUP - automated WordOps server setup script
+#  WO-INSTALL-PACK - automated WordOps server setup script
 # -------------------------------------------------------------------------
 # Website:       https://virtubox.net
+# FORKED
 # GitHub:        https://github.com/VirtuBox/ee-nginx-setup
-# Copyright (c) 2018 VirtuBox <contact@virtubox.net>
 # This script is licensed under M.I.T
 # -------------------------------------------------------------------------
 # Version 1.0 - 2019-02-19
@@ -37,7 +37,8 @@ MARIADB_SERVER_INSTALL="y"
 
 [ -z "$(command -v sudo)" ] && { apt-get -y install sudo >>/dev/null 2>&1; }
 [ -z "$(command -v curl)" ] && { apt-get -y install curl >>/dev/null 2>&1; }
-
+[ -z "$(command -v monit)" ] && { apt-get -y autoremove monit --purge >>/dev/null 2>&1; }
+rm -rf /etc/monit/
 
 
 ##################################
@@ -45,8 +46,8 @@ MARIADB_SERVER_INSTALL="y"
 ##################################
 
 _help() {
-    echo "WO-NGINX-SETUP - automated WordOps server setup script"
-    echo "Usage: ./wo-nginx-setup.sh [options]"
+    echo "WO-INSTALL.PACK - automated WordOps server setup script"
+    echo "Usage: ./wo-install-pack.sh [options]"
     echo "  Options:"
     echo "       --remote-mysql ..... install mysql-client for remote mysql access"
     echo "       -i | --interactive ..... interactive installation mode"
@@ -58,22 +59,6 @@ _help() {
     return 0
 }
 
-##################################
-# SSH Keys check
-##################################
-
-if [ -d $HOME/.ssh ]; then
-    ecdsa_keys_check=$(grep "ecdsa-sha2" -r $HOME/.ssh)
-    rsa_keys_check=$(grep "ssh-rsa" -r $HOME/.ssh)
-    ed25519_keys_check=$(grep "ssh-ed25519" -r $HOME/.ssh)
-    if [ -z "$ecdsa_keys_check" ] && [ -z "$rsa_keys_check" ] && [ -z "$ed25519_keys_check" ]; then
-        echo "This script require to use ssh keys authentification. Please make sure you have properly added your public ssh keys into .ssh/authorized_keys"
-        exit 1
-    fi
-else
-    echo "This script require to use ssh keys authentification. Please make sure you have properly added your public ssh keys into .ssh/authorized_keys"
-    exit 1
-fi
 
 ##################################
 # Arguments Parsing
@@ -105,6 +90,9 @@ else
                 --clamav)
                     CLAMAV_INSTALL="y"
                 ;;
+                --monit)
+                    MONIT_INSTALL="y"
+                ;;				
                 --ee-cleanup)
                     EE_CLEANUP="y"
                 ;;
@@ -127,12 +115,9 @@ fi
 ##################################
 
 echo ""
-echo "Welcome to Wo-Nginx-setup script."
+echo "Welcome to Wo-instal-pack script."
 echo ""
 
-[ -d /etc/ee ] && {
-    EE_PREVIOUS_INSTALL=1
-}
 
 [ -d /etc/wo ] && {
     WO_PREVIOUS_INSTALL=1
@@ -145,6 +130,8 @@ echo ""
 
 
 if [ "$INTERACTIVE_SETUP" = "y" ]; then
+
+	
     if [ -z "$(command -v mysqladmin)" ]; then
         echo "#####################################"
         echo "MariaDB server"
@@ -181,18 +168,7 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         fi
         sleep 1
     fi
-    #    if [ ! -d /etc/php/7.3/fpm/pool.d ]; then
-    #        echo ""
-    #        echo "#####################################"
-    #     echo "PHP"
-    #     echo "#####################################"
-    #     echo ""
-    #     echo "Do you want to install PHP 7.3 ? (y/n)"
-    #     while [[ $PHP73_INSTALL != "y" && $PHP73_INSTALL != "n" ]]; do
-    #         read -p "Select an option [y/n]: " PHP73_INSTALL
-    #     done
-    # fi
-    # sleep 1
+  
     echo ""
     if [ ! -d /etc/proftpd ]; then
         echo ""
@@ -213,7 +189,18 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         while [[ $CLAMAV_INSTALL != "y" && $CLAMAV_INSTALL != "n" ]]; do
             read -p "Select an option [y/n]: " CLAMAV_INSTALL
         done
-    fi
+	fi	
+    if [ -z "$(command -v monit)" ]; then
+        echo ""
+        echo "#####################################"
+        echo "FTP"
+        echo "#####################################"
+        echo "Do you want to install Monit ? (y/n)"
+        while [[ $MONIT_INSTALL != "y" && $MONIT_INSTALL != "n" ]]; do
+            read -p "Select an option [y/n]: " 	MONIT_INSTALL
+        done
+	fi	
+		
     echo ""
     echo "#####################################"
     echo "FTP"
@@ -274,6 +261,10 @@ echo "##########################################"
 echo " Updating Packages   [OK]"
 echo "##########################################"
 
+#adicionar swap
+
+fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
+
 ##################################
 # Useful packages
 ##################################
@@ -282,7 +273,9 @@ echo "##########################################"
 echo " Installing useful packages"
 echo "##########################################"
 
-sudo apt-get install haveged curl git unzip zip fail2ban htop nload nmon tar gzip ntp gnupg gnupg2 wget pigz tree ccze mycli screen tmux -y
+sudo apt-get install haveged jpegoptim optipng webp curl mutt git unzip zip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux -y
+#dpkg-reconfigure tzdata
+
 
 # ntp time
 sudo systemctl enable ntp
@@ -294,30 +287,15 @@ export HISTSIZE=10000
 # clone repository
 ##################################
 echo "###########################################"
-echo " Cloning Ubuntu-nginx-web-server repository"
+echo " Cloning wo-install repository"
 echo "###########################################"
 
-if [ ! -d $HOME/ubuntu-nginx-web-server ]; then
-    git clone https://github.com/VirtuBox/ubuntu-nginx-web-server.git $HOME/ubuntu-nginx-web-server
+if [ ! -d $HOME/wo-install ]; then
+    git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install
 else
-    git -C $HOME/ubuntu-nginx-web-server pull origin master
+    git -C $HOME/wo-install pull origin master
 fi
 
-##################################
-# Secure SSH server
-##################################
-
-# get current ssh port
-CURRENT_SSH_PORT=$(grep "Port" /etc/ssh/sshd_config | awk -F " " '{print $2}')
-
-# download secure sshd_config
-sudo cp -f $HOME/ubuntu-nginx-web-server/etc/ssh/sshd_config /etc/ssh/sshd_config
-
-# change ssh default port
-sudo sed -i "s/Port 22/Port $CURRENT_SSH_PORT/" /etc/ssh/sshd_config
-
-# restart ssh service
-sudo service ssh restart
 
 ##################################
 # ufw
@@ -341,7 +319,7 @@ sudo ufw default deny incoming
 sudo ufw allow 22
 
 # custom ssh port
-if [ "$CURRENT_SSH_PORT" != "22" ];then
+if [ "$CURRENT_SSH_PORT" != "22" ]; then
     sudo ufw allow "$CURRENT_SSH_PORT"
 fi
 
@@ -367,19 +345,9 @@ sudo ufw allow 873
 # easyengine backend
 sudo ufw allow 22222
 
-# optional for monitoring
-
-# SNMP UDP port
-#sudo ufw allow 161
-
 # Netdata web interface
-#sudo ufw allow 1999
+sudo ufw allow 19999
 
-# Librenms linux agent
-#sudo ufw allow 6556
-
-# Zabbix-agent
-#sudo ufw allow 10050
 
 ##################################
 # Sysctl tweaks +  open_files limits
@@ -389,8 +357,8 @@ echo "##########################################"
 echo " Applying Linux Kernel tweaks"
 echo "##########################################"
 
-sudo cp -f $HOME/ubuntu-nginx-web-server/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
-sudo cp -f $HOME/ubuntu-nginx-web-server/etc/security/limits.conf /etc/security/limits.conf
+sudo cp -f $HOME/wo-install/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+sudo cp -f $HOME/wo-install/etc/security/limits.conf /etc/security/limits.conf
 
 # Redis transparent_hugepage
 echo never >/sys/kernel/mm/transparent_hugepage/enabled
@@ -491,24 +459,7 @@ if [ "$MARIADB_SERVER_INSTALL" = "y" ]; then
         echo " Optimizing MariaDB configuration"
         echo "##########################################"
 
-        cp -f $HOME/ubuntu-nginx-web-server/etc/mysql/my.cnf /etc/mysql/my.cnf
-
-        # AVAILABLE_MEMORY=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)
-        # PERCENT="40"
-        # MYSQL_MEMORY_USAGE=$((MEM*PERCENT/100))
-
-        # sed -i -e "/\[mysqld\]/,/\[.*\]/s/^innodb_buffer_pool_size/#innodb_buffer_pool_size/" /etc/mysql/my.cnf
-
-        # sed -i -e 's/innodb_buffer_pool_size = [0-9]\+M/innodb_buffer_pool_size = 512M/' /etc/mysql/my.cnf
-
-        # AVAILABLE_MEMORY=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-        # BUFFER_POOL_SIZE=$(( $AVAILABLE_MEMORY / 2000 ))
-        # LOG_FILE_SIZE=$(( $AVAILABLE_MEMORY / 16000 ))
-        # LOG_BUFFER_SIZE=$(( $AVAILABLE_MEMORY / 8000 ))
-
-        # sudo sed -i "s/innodb_buffer_pool_size = 2G/innodb_buffer_pool_size = $BUFFER_POOL_SIZE\\M/" /etc/mysql/my.cnf
-        # sudo sed -i "s/innodb_log_file_size    = 256M/innodb_log_file_size    = $LOG_FILE_SIZE\\M/" /etc/mysql/my.cnf
-        # sudo sed -i "s/innodb_log_buffer_size  = 512M/innodb_log_buffer_size  = $LOG_BUFFER_SIZE\\M/" /etc/mysql/my.cnf
+        cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
 
         # stop mysql service to apply new InnoDB log file size
         sudo service mysql stop
@@ -518,7 +469,7 @@ if [ "$MARIADB_SERVER_INSTALL" = "y" ]; then
         sudo mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
 
         # increase mariadb open_files_limit
-        cp -f $HOME/ubuntu-nginx-web-server/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
+        cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
 
         # reload daemon
         systemctl daemon-reload
@@ -562,9 +513,7 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
         echo " Installing WordOps"
         echo "##########################################"
 
-        wget -O wo https://raw.githubusercontent.com/WordOps/WordOps/master/install
-        chmod +x wo
-        ./wo
+        wget -qO wo wops.cc && sudo bash wo
         source /etc/bash_completion.d/wo_auto.rc
         rm wo
 
@@ -585,24 +534,6 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
 
         /usr/local/bin/wo stack install
 
-    ##################################
-    # Fix phpmyadmin install
-    ##################################
-    # echo "##########################################"
-    # echo " Updating phpmyadmin"
-    # echo "##########################################"
-
-    # # install composer
-    # cd ~/ || exit
-    # curl -sS https://getcomposer.org/installer | php
-    # mv composer.phar /usr/bin/composer
-
-    # # change owner of /var/www to allow composer cache
-    # chown www-data:www-data /var/www
-    # # update phpmyadmin with composer
-    # if [ -d /var/www/22222/htdocs/db/pma ]; then
-    #     sudo -u www-data -H composer update -d /var/www/22222/htdocs/db/pma/
-    # fi
 
     ##################################
     # Allow www-data shell access for SFTP + add .bashrc settings et completion
@@ -617,11 +548,22 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     if [ ! -f /etc/bash_completion.d/wp-completion.bash ]; then
         # download wp-cli bash-completion
         sudo wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
+    
+    ##################################
+    # WordPress installation locale
+    ##################################
+
+    echo "##########################################"
+    echo " Customize WordPress installation locale"
+    echo "##########################################"
+
+    sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
+
     fi
     if [ ! -f /var/www/.profile ] && [ ! -f /var/www/.bashrc ]; then
         # create .profile & .bashrc for www-data user
-        cp -f $HOME/ubuntu-nginx-web-server/var/www/.profile /var/www/.profile
-        cp -f $HOME/ubuntu-nginx-web-server/var/www/.bashrc /var/www/.bashrc
+        cp -f $HOME/wo-install/var/www/.profile /var/www/.profile
+        cp -f $HOME/wo-install/var/www/.bashrc /var/www/.bashrc
 
         # set www-data as owner
         sudo chown www-data:www-data /var/www/.profile
@@ -632,46 +574,6 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     sudo -u www-data -H curl https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh | sh
 fi
 
-# ##################################
-# # Install php7.2-fpm
-# ##################################
-
-# echo "##########################################"
-# echo " Installing php7.2-fpm"
-# echo "##########################################"
-
-# sudo apt-get install php7.2-fpm php7.2-xml php7.2-bz2 php7.2-zip php7.2-mysql php7.2-intl php7.2-gd \
-# php7.2-curl php7.2-soap php7.2-mbstring php7.2-xsl php7.2-bcmath -y
-
-# # copy php7.2 config files
-# sudo cp -rf $HOME/ubuntu-nginx-web-server/etc/php/7.2/* /etc/php/7.2/
-# sudo service php7.2-fpm restart
-
-# # commit changes
-# git -C /etc/php/ add /etc/php/ && git -C /etc/php/ commit -m "add php7.2 configuration"
-
-# if [ "$PHP73_INSTALL" = "y" ]; then
-
-#     ##################################
-#     # Install php7.3-fpm
-#     ##################################
-
-#     echo "##########################################"
-#     echo " Installing php7.3-fpm"
-#     echo "##########################################"
-
-#     sudo apt-get install php7.3-fpm php7.3-xml php7.3-bz2 php7.3-zip php7.3-mysql php7.3-intl php7.3-gd php7.3-curl php7.3-soap php7.3-mbstring php7.3-bcmath -y
-
-#     sudo cp -rf $HOME/ubuntu-nginx-web-server/etc/php/7.3/* /etc/php/7.3/
-#     sudo service php7.3-fpm restart
-
-#     git -C /etc/php/ add /etc/php/ && git -C /etc/php/ commit -m "add php7.3 configuration"
-
-# fi
-
-##################################
-# Compile latest nginx release from source
-##################################
 
 echo "##########################################"
 echo " Compiling Nginx with nginx-ee"
@@ -691,10 +593,11 @@ echo " Configuring Nginx"
 echo "##########################################"
 
 # optimized nginx.config
-cp -f $HOME/ubuntu-nginx-web-server/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # commit changes
 git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
+
 
 # reduce nginx logs rotation
 sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
@@ -708,19 +611,6 @@ rm $HOME/nginx-cloudflare-real-ip.sh
 # commit changes
 git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update nginx.conf and setup cloudflare visitor real IP restore"
 
-# # check nginx configuration
-# CONF_22222=$(grep netdata /etc/nginx/sites-available/22222)
-# CONF_UPSTREAM=$(grep netdata /etc/nginx/conf.d/upstream.conf)
-
-# if [ -z "$CONF_22222" ]; then
-#     # add nginx reverse-proxy for netdata on https://yourserver.hostname:22222/netdata/
-#     sudo cp -f $HOME/ubuntu-nginx-web-server/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
-# fi
-
-# if [ -z "$CONF_UPSTREAM" ]; then
-#     # add netdata, php7.1 and php7.2 upstream
-#     sudo cp -f $HOME/ubuntu-nginx-web-server/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
-# fi
 
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 echo "##########################################"
@@ -744,12 +634,12 @@ echo "##########################################"
 echo " Configuring Fail2Ban"
 echo "##########################################"
 
-cp -rf $HOME/ubuntu-nginx-web-server/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
-cp -rf $HOME/ubuntu-nginx-web-server/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
+cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
+cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
 
 fail2ban-client reload
 
-if [ $CLAMAV_INSTALL = "y" ]; then
+if [ "$CLAMAV_INSTALL" = "y" ]; then
 
     ##################################
     # Install ClamAV
@@ -759,12 +649,12 @@ if [ $CLAMAV_INSTALL = "y" ]; then
     echo "##########################################"
 
     if [ -z "$(command -v clamscan)" ]; then
-        apt-get install clamav -y
+        apt-get install clamav clamav-daemon -y
     fi
 
-    ##################################
-    # Update ClamAV database fail2ban configurations
-    ##################################
+    #######################################
+    # Update ClamAV database configurations
+    #######################################
     echo "##########################################"
     echo " Updating ClamAV signature database"
     echo "##########################################"
@@ -773,6 +663,77 @@ if [ $CLAMAV_INSTALL = "y" ]; then
     freshclam
     /etc/init.d/clamav-freshclam start
 fi
+
+if [ "$MONIT_INSTALL" = "y" ]; then
+
+    ##################################
+    # Install Monit
+    ##################################
+    echo "##########################################"
+    echo " Installing Monit"
+    echo "##########################################"
+
+    if [ -z "$(command -v monit)" ]; then
+
+    apt-get -y autoremove monit --purge
+    rm -rf /etc/monit/
+	apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev autoconf bison libpam0g-dev
+	cd ~
+	wget https://mmonit.com/monit/dist/monit-5.25.2.tar.gz
+	tar zxvf monit-*.tar.gz
+	rm -rf monit-5.25.2.tar.gz
+	cd monit-*
+	./bootstrap
+	./configure
+	make && make install
+	mkdir /etc/monit/
+	mkdir /etc/monit/monit.d/
+	mkdir /etc/monit/conf-enable/
+	cd ~
+	cp -rf $HOME/wo-install/etc/monitrc /etc/
+	chmod 0600 /etc/monitrc
+	ln -s /etc/monitrc /etc/monit/monitrc
+#regras
+	cp -rf $HOME/wo-install/etc/monit/monit.d/* /etc/monit/monit.d/
+	cp -rf $PWD/wo-install/etc/monit.service /lib/systemd/system/monit.service
+	systemctl enable monit
+
+#linkar
+	ln -s /etc/monit/monit.d/* /etc/monit/conf-enable/
+	monit
+	monit reload
+	
+    fi
+fi	
+	
+#if [ "$RKHUNTER_INSTALL" = "y" ]; then
+#
+#    ##################################
+#    # Install Rkhunter
+#    ##################################
+#    echo "##########################################"
+#    echo " Installing Rkhunter"
+#    echo "##########################################"
+#
+#    if [ -z "$(command -v rkhunter)" ]; then
+#	
+#	apt-get install rkhunter -y
+#
+#	sed -i 's/UPDATE_MIRRORS=0/UPDATE_MIRRORS=1/' /etc/rkhunter.conf
+#	sed -i 's/MIRRORS_MODE=1/UPDATE_MIRRORS=0/' /etc/rkhunter.conf
+#	sed -i 's/WEB_CMD="\/bin\/false"/WEB_CMD=""/' /etc/rkhunter.conf
+#
+#	sed -i 's/CRON_DAILY_RUN=""/CRON_DAILY_RUN="true"/' /etc/default/rkhunter
+#	sed -i 's/CRON_DB_UPDATE=""/CRON_DB_UPDATE="true"/' /etc/default/rkhunter
+#	sed -i 's/APT_AUTOGEN="false"/APT_AUTOGEN="true"/' /etc/default/rkhunter
+#	rkhunter -C
+#	rkhunter --update
+#	rkhunter --versioncheck
+#	rkhunter --propupd
+#	rkhunter --check --sk
+#	
+#    fi
+#fi
 
 ##################################
 # Install nanorc & mysqldump script
@@ -858,64 +819,29 @@ if [ "$WO_DASHBOARD_INSTALL" = "y" ]; then
 fi
 
 ##################################
-# Install cheat.sh
+# Install Image optimization bash script
 ##################################
-
-if [ -z "$(command -v cht.sh)" ]; then
-    echo "##########################################"
-    echo " Installing cheat.sh"
-    echo "##########################################"
-
-    curl https://cht.sh/:cht.sh > /usr/local/bin/cht.sh || wget -qO  /usr/local/bin/cht.sh https://cht.sh/:cht.sh
-    chmod +x /usr/local/bin/cht.sh
-    echo 'alias cheat="cht.sh"' >> $HOME/.bashrc
-
-fi
+sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
+sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
+chmod +x /etc/cron.weekly/jpg-png-cron
 
 ##################################
-# Secure WordOps Dashboard with Acme.sh
+# create a database user called “netdata”
 ##################################
 
-# if [ "$SECURE_22222" = "y" ]; then
-
-#     MY_HOSTNAME=$(/bin/hostname -f)
-#     MY_IP=$(curl -s v4.vtbox.net)
-#     MY_HOSTNAME_IP=$(/usr/bin/dig +short @8.8.8.8 "$MY_HOSTNAME")
-
-#     if [ "$MY_IP" = "$MY_HOSTNAME_IP" ]; then
-#         echo "##########################################"
-#         echo " Securing EasyEngine Backend"
-#         echo "##########################################"
-#         apt-get install -y socat
+mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
+mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
+mysql -e "FLUSH PRIVILEGES"
 
 
-#         if [ ! -d $HOME/.acme.sh/${MY_HOSTNAME}_ecc ]; then
-#             /etc/letsencrypt/acme.sh --config-home /etc/letsencrypt/config --issue -d "$MY_HOSTNAME" -k ec-384 --standalone --pre-hook "service nginx stop" --post-hook "service nginx start"
-#         fi
+## optimize netdata resources usage
+echo 1 >/sys/kernel/mm/ksm/run
+echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
 
-#         if [ -d /etc/letsencrypt/live/$MY_HOSTNAME ]; then
-#             rm -rf /etc/letsencrypt/live/$MY_HOSTNAME/*
-#         else
-#             mkdir -p /etc/letsencrypt/live/$MY_HOSTNAME
-#         fi
+## disable email notifigrep -cions
+sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /usr/lib/netdata/conf.d/health_alarm_notify.conf
+service netdata restart
 
-#         # install the cert and reload nginx
-#         if [ -f $HOME/.acme.sh/${MY_HOSTNAME}_ecc/fullchain.cer ]; then
-#             /etc/letsencrypt/acme.sh --config-home /etc/letsencrypt/config --install-cert -d ${MY_HOSTNAME} --ecc \
-#             --cert-file /etc/letsencrypt/live/${MY_HOSTNAME}/cert.pem \
-#             --key-file /etc/letsencrypt/live/${MY_HOSTNAME}/key.pem \
-#             --fullchain-file /etc/letsencrypt/live/${MY_HOSTNAME}/fullchain.pem \
-#             --reloadcmd "service nginx restart"
-#         fi
-
-#         if [ -f /etc/letsencrypt/live/${MY_HOSTNAME}/fullchain.pem ] && [ -f /etc/letsencrypt/live/${MY_HOSTNAME}/key.pem ]; then
-#             sed -i "s/ssl_certificate \\/var\\/www\\/22222\\/cert\\/22222.crt;/ssl_certificate \\/etc\\/letsencrypt\\/live\\/${MY_HOSTNAME}\\/fullchain.pem;/" /etc/nginx/sites-available/22222
-#             sed -i "s/ssl_certificate_key \\/var\\/www\\/22222\\/cert\\/22222.key;/ssl_certificate_key    \\/etc\\/letsencrypt\\/live\\/${MY_HOSTNAME}\\/key.pem;/" /etc/nginx/sites-available/22222
-#         fi
-#         service nginx reload
-
-#     fi
-# fi
 
 ##################################
 # Cleanup previous EasyEngine install
@@ -929,8 +855,12 @@ if [ "$EE_CLEANUP" = "y" ]; then
     apt-get -y autoremove php5.6-fpm php5.6-common --purge
     apt-get -y autoremove php7.0-fpm php7.0-common --purge
     apt-get -y autoremove php7.1-fpm php7.1-common --purge
+    cd ~
 fi
-
-echo ""
-echo -e "       ${CGREEN}Optimized Wordops was setup successfully !${CEND}"
-echo ""
+ADDRESS=$(hostname -I | awk '{ print $1}')
+echo " "
+echo " Optimized Wordops was setup successfully! "
+echo " Dashboard https://$ADDRESS:22222"
+echo " Dashboard https://$ADDRESS:22222/netdata"
+echo " Dashboard https://$ADDRESS:22222/monit"
+echo " "
