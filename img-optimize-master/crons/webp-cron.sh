@@ -4,11 +4,9 @@
 ## images path are listed in sites.csv
 ## written by VirtuBox (https://virtubox.net)
 
-sites="/var/www/yoursite.tld/images \
-       /var/www/yourothersite.tld/content/images \
-       /var/www/yourthirdsite.tld/wp-content/uploads"
+sites=$(ls -1L /var/www -I22222 -Ihtml)
 
-for site in $sites; do
+for site in ${sites[@]}; do
 # convert png created in the last 24 hours to webp
 {
 find "$site" -ctime 0 -type f -iname "*.png" -print0 | xargs -0 -I {}  \

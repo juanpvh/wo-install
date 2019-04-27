@@ -13,18 +13,14 @@
 CSI='\033['
 CEND="${CSI}0m"
 CGREEN="${CSI}1;32m"
-
-##################################
-# Variables
-##################################
-
-WO_DASHBOARD_INSTALL="y"
-MARIADB_SERVER_INSTALL="y"
+CRED="${CSI}1;31m"
 
 
-##################################
-# Check if user is root
-##################################
+###Variaveis
+
+
+
+###Checando usuario root
 
 [ "$(id -u)" != "0" ] && {
     echo "Error: You must be root to run this script, please use the root user to install the software."
@@ -80,13 +76,6 @@ else
                 --proftpd)
                     PROFTPD_INSTALL="y"
                 ;;
-                --remote-mysql)
-                    MARIADB_CLIENT_INSTALL="y"
-                ;;
-                --mariadb)
-                    MARIADB_VERSION_INSTALL="$2"
-                    shift
-                ;;
                 --clamav)
                     CLAMAV_INSTALL="y"
                 ;;
@@ -101,6 +90,9 @@ else
                 ;;
                 --travis)
                     TRAVIS_BUILD="y"
+                ;;
+                --extplorer)
+                    WO_EXTPLORER_INSTALL="y"
                 ;;
                 -h|--help)
                     _help
@@ -118,12 +110,8 @@ fi
 ##################################
 
 echo ""
-echo "Welcome to Wo-instal-pack script."
+echo "Bem Vindo ao script Wo-instal-pack."
 echo ""
-
-[ -d /etc/ee ] && {
-    EE_PREVIOUS_INSTALL=1
-}
 
 [ -d /etc/wo ] && {
     WO_PREVIOUS_INSTALL=1
@@ -137,133 +125,59 @@ echo ""
 
 if [ "$INTERACTIVE_SETUP" = "y" ]; then
 
-	
-    if [ -z "$(command -v mysqladmin)" ]; then
-        echo "#####################################"
-        echo "MariaDB server"
-        echo "#####################################"
-        echo ""
-        echo "Do you want to install MariaDB-server ? (y/n)"
-        while [[ $MARIADB_SERVER_INSTALL != "y" && $MARIADB_SERVER_INSTALL != "n" ]]; do
-            read -p "Select an option [y/n]: " MARIADB_SERVER_INSTALL
-        done
-        if [ "$MARIADB_SERVER_INSTALL" = "n" ]; then
-            echo ""
-            echo "Do you want to install MariaDB-client for a remote database ? (y/n)"
-            while [[ $MARIADB_CLIENT_INSTALL != "y" && $MARIADB_CLIENT_INSTALL != "n" ]]; do
-                read -p "Select an option [y/n]: " MARIADB_CLIENT_INSTALL
-            done
-        fi
-        if [ "$MARIADB_CLIENT_INSTALL" = "y" ]; then
-            echo ""
-            echo "What is the IP of your remote database ?"
-            read -p "IP : " MARIADB_REMOTE_IP
-            echo ""
-            echo "What is the user of your remote database ?"
-            read -p "User : " MARIADB_REMOTE_USER
-            echo ""
-            echo "What is the password of your remote database ?"
-            read -s -p "password [hidden] : " MARIADB_REMOTE_PASSWORD
-        fi
-        if [[ "$MARIADB_SERVER_INSTALL" == "y" || "$MARIADB_CLIENT_INSTALL" == "y" ]]; then
-            echo ""
-            echo "What version of MariaDB Client/Server do you want to install, 10.1, 10.2 or 10.3 ?"
-            while [[ $MARIADB_VERSION_INSTALL != "10.1" && $MARIADB_VERSION_INSTALL != "10.2" && $MARIADB_VERSION_INSTALL != "10.3" ]]; do
-                read -p "Select an option [10.1 / 10.2 / 10.3]: " MARIADB_VERSION_INSTALL
-            done
-        fi
-        sleep 1
-    fi
-  
     echo ""
     if [ ! -d /etc/proftpd ]; then
         echo ""
         echo "#####################################"
         echo "FTP"
         echo "#####################################"
-        echo "Do you want to install proftpd ? (y/n)"
+        echo "Voce quer instalar o proftpd ? (y/n)"
         while [[ $PROFTPD_INSTALL != "y" && $PROFTPD_INSTALL != "n" ]]; do
-            read -p "Select an option [y/n]: " PROFTPD_INSTALL
+            read -p "Selecione a opção [y/n]: " PROFTPD_INSTALL
         done
     fi
+    ########################################
     if [ -z "$(command -v clamscan)" ]; then
         echo ""
         echo "#####################################"
         echo "FTP"
         echo "#####################################"
-        echo "Do you want to install ClamAV ? (y/n)"
+        echo "Voce quer instalar o ClamAV ? (y/n)"
         while [[ $CLAMAV_INSTALL != "y" && $CLAMAV_INSTALL != "n" ]]; do
-            read -p "Select an option [y/n]: " CLAMAV_INSTALL
+            read -p "Selecione a opção [y/n]: " CLAMAV_INSTALL
         done
-	fi	
+	fi
+    ######################################
     if [ -z "$(command -v monit)" ]; then
         echo ""
         echo "#####################################"
-        echo "FTP"
+        echo "MONIT"
         echo "#####################################"
-        echo "Do you want to install Monit ? (y/n)"
+        echo "Voce quer instalar o ClamAV Monit ? (y/n)"
         while [[ $MONIT_INSTALL != "y" && $MONIT_INSTALL != "n" ]]; do
-            read -p "Select an option [y/n]: " 	MONIT_INSTALL
+            read -p "Selecione a opção [y/n]: " 	MONIT_INSTALL
         done
 	fi
+    ########################################
 	if [ -z "$(command -v rkhunter)" ]; then
         echo ""
         echo "#####################################"
         echo "FTP"
         echo "#####################################"
-        echo "Do you want to install Rkhunter ? (y/n)"
+        echo "Voce quer instalar o Rkhunter ? (y/n)"
         while [[ $RKHUNER_INSTALL != "y" && $RKHUNTER_INSTALL != "n" ]]; do
-            read -p "Select an option [y/n]: " 	RKHUNTER_INSTALL
+            read -p "Selecione a opção [y/n]: " 	RKHUNTER_INSTALL
         done
 	fi	
 		
-    echo ""
-    echo "#####################################"
-    echo "FTP"
-    echo "#####################################"
-    echo "Do you want to install WordOps Dashboard ? (y/n)"
-    while [[ $WO_DASHBOARD_INSTALL != "y" && $WO_DASHBOARD_INSTALL != "n" ]]; do
-        read -p "Select an option [y/n]: " WO_DASHBOARD_INSTALL
-    done
-    echo ""
-    if [ "$EE_PREVIOUS_INSTALL" = "1" ]; then
-    echo "#####################################"
-    echo "EasyEngine Cleanup"
-    echo "#####################################"
-    echo "Do you want to cleanup previous EasyEngine install ? (y/n)"
-    while [[ $EE_CLEANUP != "y" && $EE_CLEANUP != "n" ]]; do
-        read -p "Select an option [y/n]: " EE_CLEANUP
-    done
-    echo ""
-    fi
-    echo "#####################################"
-    echo "Starting server setup in 5 seconds"
-    echo "use CTRL + C if you want to cancel installation"
-    echo "#####################################"
-    sleep 5
-else
-    if [ "$MARIADB_CLIENT_INSTALL" = "y" ]; then
-        echo ""
-        echo "What is the IP of your remote database ?"
-        read -p "IP : " MARIADB_REMOTE_IP
-        echo ""
-        echo "What is the user of your remote database ?"
-        read -p "User : " MARIADB_REMOTE_USER
-        echo ""
-        echo "What is the password of your remote database ?"
-        read -s -p "password [hidden] : " MARIADB_REMOTE_PASSWORD
-    fi
 
-fi
+#adicionar swap
 
-##################################
-# Update packages
-##################################
+fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
 
-echo "##########################################"
-echo " Updating Packages"
-echo "##########################################"
+###Pacotes do Sistemas Atualizados
 
+echo -e "${CGREEN}Atualizando Pacotes do Sistemas...${CEND}"
 [ -z "$TRAVIS_BUILD" ] && {
 
     sudo apt-get update
@@ -271,62 +185,80 @@ echo "##########################################"
     sudo apt-get autoremove -y --purge
     sudo apt-get autoclean -y
 
-}
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Pacotes do Sistemas Atualizados${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Atualização dos Pacotes do Sistema${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-echo "##########################################"
-echo " Updating Packages   [OK]"
-echo "##########################################"
 
-#adicionar swap
+###Instalação de Serviços Adicionais
 
-fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
-
-##################################
-# Useful packages
-##################################
-
-echo "##########################################"
-echo " Installing useful packages"
-echo "##########################################"
-
-sudo apt-get install haveged jpegoptim optipng webp curl mutt git unzip zip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux -y
-dpkg-reconfigure tzdata
-
+ echo -e "${CGREEN}Instando Serviços Adicionais...${CEND}"
+{ sudo apt-get install haveged jpegoptim optipng webp curl mutt git unzip zip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux php7.2-intl php7.3-intl -y
+ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+dpkg-reconfigure --frontend noninteractive tzdata
 
 # ntp time
 sudo systemctl enable ntp
 
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação de Serviços Adicionais${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação de Serviços Adicionais${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+
 # increase history size
 export HISTSIZE=10000
 
-##################################
-# clone repository
-##################################
-echo "###########################################"
-echo " Cloning wo-install repository"
-echo "###########################################"
-
+###Clonando repositorio
+echo -e "${CGREEN}Clonando repositório...${CEND}"
+{
 if [ ! -d $HOME/wo-install ]; then
     git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install
 else
     git -C $HOME/wo-install pull origin master
 fi
 
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Repositório Clonado${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Clone do Repositório${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-##################################
-# ufw
-##################################
-
-echo "##########################################"
-echo " Configuring ufw"
-echo "##########################################"
-
-if [ ! -d /etc/ufw ]; then
+###Instalando firewall - ufw
+echo -e "${CGREEN}Instalando firewall - ufw...${CEND}"
+{
+    if [ ! -d /etc/ufw ]; then
     sudo apt-get install ufw -y
 fi
 
-# define firewall rules
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Ufw instalado${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}instalação do ufw ${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
+###Difinindo regras do firewall - ufw
+echo -e "${CGREEN}Difinindo regras do firewall - ufw...${CEND}"
+{
 sudo ufw logging low
 sudo ufw default allow outgoing
 sudo ufw default deny incoming
@@ -364,160 +296,99 @@ sudo ufw allow 22222
 # Netdata web interface
 sudo ufw allow 19999
 
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Regras do firewall adicionadas${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Adição das regras do firewall${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-##################################
-# Sysctl tweaks +  open_files limits
-##################################
+###Otimizando Sysctl tweaks +  open_files limits
+echo -e "${CGREEN}Otimizando Sysctl tweaks +  open_files limits...${CEND}"
+{
 
-echo "##########################################"
-echo " Applying Linux Kernel tweaks"
-echo "##########################################"
+        sudo cp -f $HOME/wo-install/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+        sudo cp -f $HOME/wo-install/etc/security/limits.conf /etc/security/limits.conf
 
-sudo cp -f $HOME/wo-install/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
-sudo cp -f $HOME/wo-install/etc/security/limits.conf /etc/security/limits.conf
+        # Redis transparent_hugepage
+        echo never >/sys/kernel/mm/transparent_hugepage/enabled
 
-# Redis transparent_hugepage
-echo never >/sys/kernel/mm/transparent_hugepage/enabled
+    # disable ip forwarding if docker is not installed
+    if [ ! -x /usr/bin/docker ]; then
 
-# disable ip forwarding if docker is not installed
-if [ ! -x /usr/bin/docker ]; then
+        echo "" >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+        {
+            echo "# Disables packet forwarding"
+            echo "net.ipv4.ip_forward = 0"
+            echo "net.ipv4.conf.all.forwarding = 0"
+            echo "net.ipv4.conf.default.forwarding = 0"
+            echo "net.ipv6.conf.all.forwarding = 0"
+            echo "net.ipv6.conf.default.forwarding = 0"
+        } >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
 
+    fi
+
+    # additional systcl configuration with network interface name
+    # get network interface names like eth0, ens18 or eno1
+    # for each interface found, add the following configuration to sysctl
+
+    NET_INTERFACES_WAN=$(ip -4 route get 8.8.8.8 | grep -oP "dev [^[:space:]]+ " | cut -d ' ' -f 2)
     echo "" >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
     {
-        echo "# Disables packet forwarding"
-        echo "net.ipv4.ip_forward = 0"
-        echo "net.ipv4.conf.all.forwarding = 0"
-        echo "net.ipv4.conf.default.forwarding = 0"
-        echo "net.ipv6.conf.all.forwarding = 0"
-        echo "net.ipv6.conf.default.forwarding = 0"
+        echo "# do not autoconfigure IPv6 on $NET_INTERFACES_WAN"
+        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
+        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
+        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
+        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
+        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
     } >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
 
-fi
+    sudo sysctl -e -p /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
 
-# additional systcl configuration with network interface name
-# get network interface names like eth0, ens18 or eno1
-# for each interface found, add the following configuration to sysctl
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Otimização do Sysctl tweaks +  open_files limits${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Otimização do Sysctl tweaks +  open_files limits${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-NET_INTERFACES_WAN=$(ip -4 route get 8.8.8.8 | grep -oP "dev [^[:space:]]+ " | cut -d ' ' -f 2)
-echo "" >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+###Otimizando a configuração do mariadb
+echo -e "${CGREEN}Otimizando a configuração do mariadb...${CEND}"
 {
-    echo "# do not autoconfigure IPv6 on $NET_INTERFACES_WAN"
-    echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
-    echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
-    echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
-    echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
-    echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
-} >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+    cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
+    # stop mysql service to apply new InnoDB log file size
+    sudo service mysql stop
+    # mv previous log file
+    sudo mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
+    sudo mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
+    # increase mariadb open_files_limit
+    cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
+    # reload daemon
+    systemctl daemon-reload
+    # restart mysql
+    service mysql start
+    
 
-sudo sysctl -e -p /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
-
-##################################
-# Add MariaDB 10.3 repository
-##################################
-
-if [ "$MARIADB_SERVER_INSTALL" = "y" ]; then
-    [ -z "$MARIADB_VERSION_INSTALL" ] && {
-        MARIADB_VERSION_INSTALL="10.3"
-    }
-    if [ ! -f /etc/apt/sources.list.d/mariadb.list ]; then
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Otimização da configuração do mariaDB${CEND}   [${CGREEN}OK${CEND}]"
         echo ""
-        echo "##########################################"
-        echo " Adding MariaDB $MARIADB_VERSION_INSTALL repository"
-        echo "##########################################"
-
-        wget -O mariadb_repo_setup https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
-        chmod +x mariadb_repo_setup
-        ./mariadb_repo_setup --mariadb-server-version="$MARIADB_VERSION_INSTALL" --skip-maxscale -y
-        rm mariadb_repo_setup
-        sudo apt-get update
-
+    else
+        echo -e "${CRED}Otimização da configuração do mariaDB${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
     fi
+###
 
-    ##################################
-    # MariaDB 10.3 install
-    ##################################
-
-    # install mariadb server non-interactive way
-    if [ ! -d /etc/mysql ]; then
-        echo ""
-        echo "##########################################"
-        echo " Installing MariaDB server $MARIADB_VERSION_INSTALL"
-        echo "##########################################"
-
-        # generate random password
-        MYSQL_ROOT_PASS="$(date +%s | sha256sum | base64 | head -c 32)"
-        export DEBIAN_FRONTEND=noninteractive                             # to avoid prompt during installation
-        sudo debconf-set-selections <<<"mariadb-server-${MARIADB_VERSION_INSTALL} mysql-server/root_password password ${MYSQL_ROOT_PASS}"
-        sudo debconf-set-selections <<<"mariadb-server-${MARIADB_VERSION_INSTALL} mysql-server/root_password_again password ${MYSQL_ROOT_PASS}"
-        # install mariadb server
-        DEBIAN_FRONTEND=noninteractive apt-get install -qq mariadb-server # -qq implies -y --force-yes
-        # save credentials in .my.cnf and copy it in /etc/mysql/conf.d for easyengine
-        echo -e '[client]\nuser = root' > $HOME/.my.cnf
-        echo "password = $MYSQL_ROOT_PASS" >>$HOME/.my.cnf
-        cp -f $HOME/.my.cnf /etc/mysql/conf.d/my.cnf
-
-        ## mysql_secure_installation non-interactive way
-        mysql -e "GRANT ALL PRIVILEGES on *.* to 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASS' WITH GRANT OPTION;"
-        # remove anonymous users
-        mysql -e "DROP USER ''@'localhost'" > /dev/null 2>&1
-        mysql -e "DROP USER ''@'$(hostname)'" > /dev/null 2>&1
-        # remove test database
-        mysql -e "DROP DATABASE test" > /dev/null 2>&1
-        # flush privileges
-        mysql -e "FLUSH PRIVILEGES"
-
-
-        ##################################
-        # MariaDB tweaks
-        ##################################
-
-        echo "##########################################"
-        echo " Optimizing MariaDB configuration"
-        echo "##########################################"
-
-        cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
-
-        # stop mysql service to apply new InnoDB log file size
-        sudo service mysql stop
-
-        # mv previous log file
-        sudo mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
-        sudo mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
-
-        # increase mariadb open_files_limit
-        cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
-
-        # reload daemon
-        systemctl daemon-reload
-
-        # restart mysql
-        service mysql start
-
-    fi
-fi
-
-if [ "$MARIADB_CLIENT_INSTALL" = "y" ]; then
-
-    echo "installing mariadb-client"
-
-    # install mariadb-client
-    apt-get install -y mariadb-client
-
-    # set mysql credentials in .my.cnf
-    echo "[client]" >>$HOME/.my.cnf
-    echo "host = $MARIADB_REMOTE_IP" >>$HOME/.my.cnf
-    echo "port = 3306" >>$HOME/.my.cnf
-    echo "user = $MARIADB_REMOTE_USER" >>$HOME/.my.cnf
-    echo "password = $MARIADB_REMOTE_PASSWORD" >>$HOME/.my.cnf
-
-    # copy .my.cnf in /etc/mysql/conf.d/ for easyengine
-    cp $HOME/.my.cnf /etc/mysql/conf.d/my.cnf
-fi
-
-##################################
-# WordOps automated install
-##################################
-
+################################################
+###Instalação do WordOps
+###############################################
+echo -e "${CGREEN}Instalando WordOps...${CEND}"
 if [ -z "$WO_PREVIOUS_INSTALL" ]; then
 
     if [ ! -f $HOME/.gitconfig ]; then
@@ -525,40 +396,48 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
         sudo bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
     fi
     if [ ! -x /usr/local/bin/wo ]; then
-        echo "##########################################"
-        echo " Installing WordOps"
-        echo "##########################################"
 
         wget -qO wo wops.cc && sudo bash wo
         source /etc/bash_completion.d/wo_auto.rc
         rm wo
+    sudo cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf etc/nginx/conf.d/upstream.conf
+    sudo cp -f $HOME/wo-install/etc/nginx/sites-available/22222 etc/nginx/sites-available/22222
+    sudo cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
+    sudo cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
 
     fi
 
-    ##################################
-    # WordOps stacks install
-    ##################################
-
-    if [ "$MARIADB_CLIENT_INSTALL" = "y" ]; then
-        # change MySQL host to % in case of remote MySQL server
-        sudo sed -i 's/grant-host = localhost/grant-host = \%/' /etc/wo/wo.conf
+    } >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação do WordOps${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação do WordOps${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
     fi
+###
 
-    echo "##########################################"
-    echo " Installing WordOps Stack"
-    echo "##########################################"
-
-        /usr/local/bin/wo stack install
-		/usr/local/bin/wo stack install --php73 --redis --admin --phpredisadmin
-		apt-get install -y php7.0-intl
+###Instalando Pack adicional do WordOps
+echo -e "${CGREEN}Instalando pack do WordOps...${CEND}"
 
 
-    ##################################
-    # Allow www-data shell access for SFTP + add .bashrc settings et completion
-    ##################################
-    echo "##########################################"
-    echo " Configuring www-data shell access"
-    echo "##########################################"
+    /usr/local/bin/wo stack install --all --php73 --redis --admin --phpredisadmin --memcached --redis --utils
+
+	
+
+    } >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação da pack do WordOps${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação da pack do WordOps${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+###Configurando adicionais acesso www-data shell
+echo -e "${CGREEN}Configurando acesso www-data shell...${CEND}"
+{
 
     # change www-data shell
     usermod -s /bin/bash www-data
@@ -566,18 +445,14 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
     if [ ! -f /etc/bash_completion.d/wp-completion.bash ]; then
         # download wp-cli bash-completion
         sudo wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
-    
-    ##################################
-    # WordPress installation locale
-    ##################################
-
-    echo "##########################################"
-    echo " Customize WordPress installation locale"
-    echo "##########################################"
+ 
+  
+    #Customize WordPress installation locale
 
     sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
 
     fi
+
     if [ ! -f /var/www/.profile ] && [ ! -f /var/www/.bashrc ]; then
         # create .profile & .bashrc for www-data user
         cp -f $HOME/wo-install/var/www/.profile /var/www/.profile
@@ -590,28 +465,38 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
 
     # install nanorc for www-data
     sudo -u www-data -H curl https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh | sh
-fi
+
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Configurações adicionais acesso www-data shell${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Configurações adicionais acesso www-data shell${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
 
-echo "##########################################"
-echo " Compiling Nginx with nginx-ee"
-echo "##########################################"
+
+###Compilando a Pilha Nginx-ee
+echo -e "${CGREEN}Compilando a Pilha Nginx-ee...${CEND}"
+{
 
 wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
 chmod +x $HOME/nginx-build.sh
 
+} >> /tmp/registro.log 2>&1
+
+#executando a pilha
 $HOME/nginx-build.sh
+###
 
-##################################
-# Add nginx additional conf
-##################################
-
-echo "##########################################"
-echo " Configuring Nginx"
-echo "##########################################"
+###Configuração adicional nginx, logrotate, fail2ban...
+echo -e "${CGREEN}Configuração adicional nginx, logrotate, fail2ban...${CEND}"
+{
 
 # optimized nginx.config
-cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+#cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # commit changes
 git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
@@ -621,75 +506,68 @@ git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.
 sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
 sed -i 's/rotate 52/rotate 4/' /etc/logrotate.d/nginx
 
-wget -O $HOME/nginx-cloudflare-real-ip.sh https://raw.githubusercontent.com/VirtuBox/nginx-cloudflare-real-ip/master/nginx-cloudflare-real-ip.sh
-chmod +x $HOME/nginx-cloudflare-real-ip.sh
-$HOME/nginx-cloudflare-real-ip.sh
-rm $HOME/nginx-cloudflare-real-ip.sh
+
 
 # commit changes
 git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update nginx.conf and setup cloudflare visitor real IP restore"
 
 
 VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
-echo "##########################################"
-echo "Checking Nginx configuration"
-echo "##########################################"
+
 if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-    echo "##########################################"
-    echo "Reloading Nginx"
-    echo "##########################################"
     sudo service nginx reload
 else
-    echo "##########################################"
+
     echo "Nginx configuration is not correct"
-    echo "##########################################"
+
 fi
 
-##################################
 # Add fail2ban configurations
-##################################
-echo "##########################################"
-echo " Configuring Fail2Ban"
-echo "##########################################"
-
 cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
 cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
 
 fail2ban-client reload
 
-if [ "$CLAMAV_INSTALL" = "y" ]; then
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Configuração adicional nginx, logrotate, fail2ban${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Configuração adicional nginx, logrotate, fail2ban${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-    ##################################
-    # Install ClamAV
-    ##################################
-    echo "##########################################"
-    echo " Installing ClamAV"
-    echo "##########################################"
+###Instalando Clamav...
+echo -e "${CGREEN}Instalando Clamav...${CEND}"
+{
+if [ "$CLAMAV_INSTALL" = "y" ]; then
 
     if [ -z "$(command -v clamscan)" ]; then
         apt-get install clamav clamav-daemon -y
     fi
-
-    #######################################
-    # Update ClamAV database configurations
-    #######################################
-    echo "##########################################"
-    echo " Updating ClamAV signature database"
-    echo "##########################################"
 
     /etc/init.d/clamav-freshclam stop
     freshclam
     /etc/init.d/clamav-freshclam start
 fi
 
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação do Clamav${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação do Clamav${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+###Instalando Monit...
+echo -e "${CGREEN}Instalando Monit...${CEND}"
+{
+    
 if [ "$MONIT_INSTALL" = "y" ]; then
 
-    ##################################
-    # Install Monit
-    ##################################
-    echo "##########################################"
-    echo " Installing Monit"
-    echo "##########################################"
 
     if [ -z "$(command -v monit)" ]; then
 
@@ -723,7 +601,18 @@ if [ "$MONIT_INSTALL" = "y" ]; then
 	
     fi
 fi	
-	
+
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação do Monit${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação do Monit${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+
 #if [ "$RKHUNTER_INSTALL" = "y" ]; then
 #
 #    ##################################
@@ -753,13 +642,10 @@ fi
 #    fi
 #fi
 
-##################################
-# Install nanorc & mysqldump script
-##################################
 
-echo "##########################################"
-echo " Installing nanorc & mysqldump script"
-echo "##########################################"
+###Instalando Nanorc...
+#echo -e "${CGREEN}Instalando Nanorc...${CEND}"
+{
 
 wget -O nanorc.sh https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh
 chmod +x nanorc.sh
@@ -768,10 +654,21 @@ chmod +x nanorc.sh
 wget -O mysqldump.sh virtubox.net/mysqldump
 chmod +x mysqldump.sh
 
-##################################
-# Install ProFTPd
-##################################
 
+} >> /tmp/registro.log 2>&1
+#    if [ $? -eq 0 ]; then
+#        echo -e "${CGREEN}Instalação no Nanorc${CEND}   [${CGREEN}OK${CEND}]"
+#        echo ""
+#    else
+#        echo -e "${CRED}Instalação do Nanorcv${CEND}   [${CRED}FALHOU${CEND}]"
+#        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+#    fi
+###
+
+
+###Instalando ProFTPd...
+echo -e "${CGREEN}Instalando ProFTPd...${CEND}"
+{
 if [ "$PROFTPD_INSTALL" = "y" ]; then
 
     echo "##########################################"
@@ -802,22 +699,25 @@ if [ "$PROFTPD_INSTALL" = "y" ]; then
     fi
 fi
 
-if [ "$WO_DASHBOARD_INSTALL" = "y" ]; then
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação do ProFTPd${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação do ProFTPd${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-    ##################################
-    # Install EasyEngine Dashboard
-    ##################################
-
-    echo "##########################################"
-    echo " Installing EasyEngine Dashboard"
-    echo "##########################################"
-
-
+###Instalando EXTPLORER...
+echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
+{
+if [ "$WO_EXTPLORER_INSTALL" = "y" ]; then
 
     if [ ! -d /var/www/22222/htdocs/files ]; then
 
         mkdir -p /var/www/22222/htdocs/files
-        wget -qO /var/www/22222/htdocs/files/ex.zip https://extplorer.net/attachments/78/eXtplorer_2.1.12.zip
+        wget -qO /var/www/22222/htdocs/files/ex.zip https://extplorer.net/attachments/download/78/eXtplorer_2.1.12.zip
         cd /var/www/22222/htdocs/files || exit 1
         unzip ex.zip
         rm ex.zip
@@ -825,20 +725,21 @@ if [ "$WO_DASHBOARD_INSTALL" = "y" ]; then
 
     cd /var/www/22222 || exit
 
-    ## download latest version of Wordops-dashboard
-    cd /tmp || exit
-    git clone https://github.com/WordOps/wordops-dashboard.git
-    cp -rf /tmp/wordops-dashboard/* /var/www/22222/htdocs/
-    mv /tmp/wordops-dashboard/.gitignore /var/www/22222/htdocs/.gitignore
-    mv /tmp/wordops-dashboard/.git /var/www/22222/htdocs/.git
-    chown -R www-data:www-data /var/www/22222/htdocs
-    rm -rf /tmp/wordops-dashboard
-
 fi
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação do EXTPLORER${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação do EXTPLORER${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 
-##################################
-# Install Image optimization bash script
-##################################
+###Instalando Script de otimização de imagens...
+echo -e "${CGREEN}Instalando script de otimização de imagens...${CEND}"
+{
+
 sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
 sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
 chmod +x /etc/cron.weekly/jpg-png-cron
@@ -847,36 +748,57 @@ chmod +x /etc/cron.weekly/jpg-png-cron
 # create a database user called “netdata”
 ##################################
 
-mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
-mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
-mysql -e "FLUSH PRIVILEGES"
+#mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
+#mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
+#mysql -e "FLUSH PRIVILEGES"
 
 
 ## optimize netdata resources usage
-echo 1 >/sys/kernel/mm/ksm/run
-echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
+#echo 1 >/sys/kernel/mm/ksm/run
+#echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
 
 ## disable email notifigrep -cions
 sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /usr/lib/netdata/conf.d/health_alarm_notify.conf
 service netdata restart
 
+} >> /tmp/registro.log 2>&1
 
-##################################
-# Cleanup previous EasyEngine install
-##################################
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação Script de otimização de imagens${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação Script de otimização de imagens${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+
+###Limpando Instalação...
+echo -e "${CGREEN}Limpando php's versões anteriores...${CEND}"
+{
 
 if [ "$EE_CLEANUP" = "y" ]; then
-    echo "##########################################"
-    echo " Cleaning up previous EasyEngine installation"
-    echo "##########################################"
 
     apt-get -y autoremove php5.6-fpm php5.6-common --purge
     apt-get -y autoremove php7.0-fpm php7.0-common --purge
     apt-get -y autoremove php7.1-fpm php7.1-common --purge
     cd ~
 fi
+
+} >> /tmp/registro.log 2>&1
+
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Versões anteriores do php's removidos${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}remoção dos antigos php's${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
 ADDRESS=$(hostname -I | awk '{ print $1}')
 echo " "
+
 echo " Optimized Wordops was setup successfully! "
 echo " Dashboard https://$ADDRESS:22222"
 echo " Dashboard https://$ADDRESS:22222/netdata"
