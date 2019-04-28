@@ -224,11 +224,11 @@ export HISTSIZE=10000
 ###Clonando repositorio
 echo -e "${CGREEN}Clonando repositório...${CEND}"
 {
-if [ ! -d $HOME/wo-install ]; then
-    git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install
-else
-    git -C $HOME/wo-install pull origin master
-fi
+    if [ ! -d $HOME/wo-install ]; then
+        git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install
+    else
+        git -C $HOME/wo-install pull origin master
+    fi
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -244,8 +244,8 @@ fi
 echo -e "${CGREEN}Instalando firewall - ufw...${CEND}"
 {
     if [ ! -d /etc/ufw ]; then
-    sudo apt-get install ufw -y
-fi
+        sudo apt-get install ufw -y
+    fi
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -260,44 +260,44 @@ fi
 ###Difinindo regras do firewall - ufw
 echo -e "${CGREEN}Difinindo regras do firewall - ufw...${CEND}"
 {
-sudo ufw logging low
-sudo ufw default allow outgoing
-sudo ufw default deny incoming
+    sudo ufw logging low
+    sudo ufw default allow outgoing
+    sudo ufw default deny incoming
 
-# default ssh port
-sudo ufw allow 22
+    # default ssh port
+    sudo ufw allow 22
 
-# custom ssh port
-if [ "$CURRENT_SSH_PORT" != "22" ]; then
-    sudo ufw allow "$CURRENT_SSH_PORT"
-fi
+    # custom ssh port
+    if [ "$CURRENT_SSH_PORT" != "22" ]; then
+        sudo ufw allow "$CURRENT_SSH_PORT"
+    fi
 
-# dns
-sudo ufw allow 53
+    # dns
+    sudo ufw allow 53
 
-# nginx
-sudo ufw allow http
-sudo ufw allow https
+    # nginx
+    sudo ufw allow http
+    sudo ufw allow https
 
-# ntp
-sudo ufw allow 123
+    # ntp
+    sudo ufw allow 123
 
-# dhcp client
-sudo ufw allow 68
+    # dhcp client
+    sudo ufw allow 68
 
-# dhcp ipv6 client
-sudo ufw allow 546
+    # dhcp ipv6 client
+    sudo ufw allow 546
 
-# rsync
-sudo ufw allow 873
+    # rsync
+    sudo ufw allow 873
 
-# easyengine backend
-sudo ufw allow 22222
+    # easyengine backend
+    sudo ufw allow 22222
 
-# Netdata web interface
-sudo ufw allow 19999
-# Monit web interface
-sudo ufw allow 2812
+    # Netdata web interface
+    sudo ufw allow 19999
+    # Monit web interface
+    sudo ufw allow 2812
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -658,12 +658,12 @@ echo -e "${CGREEN}Instalando Monit...${CEND}"
 #echo -e "${CGREEN}Instalando Nanorc...${CEND}"
 {
 
-wget -O nanorc.sh https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh
-chmod +x nanorc.sh
-./nanorc.sh
+    wget -O nanorc.sh https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh
+    chmod +x nanorc.sh  
+    ./nanorc.sh
 
-wget -O mysqldump.sh virtubox.net/mysqldump
-chmod +x mysqldump.sh
+    wget -O mysqldump.sh virtubox.net/mysqldump
+    chmod +x mysqldump.sh
 
 
 } >> /tmp/registro.log 2>&1
@@ -733,6 +733,7 @@ echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
         cd /var/www/22222 || exit
 
     fi
+
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
         echo -e "${CGREEN}Instalação do EXTPLORER${CEND}   [${CGREEN}OK${CEND}]"
@@ -747,26 +748,26 @@ echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
 echo -e "${CGREEN}Instalando script de otimização de imagens...${CEND}"
 {
 
-sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
-sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
-chmod +x /etc/cron.weekly/jpg-png-cron
+    sudo cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
+    sudo cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
+    chmod +x /etc/cron.weekly/jpg-png-cron
 
-##################################
-# create a database user called “netdata”
-##################################
+    ##################################
+    # create a database user called “netdata”
+    ##################################
 
-#mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
-#mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
-#mysql -e "FLUSH PRIVILEGES"
+    #mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
+    #mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
+    #mysql -e "FLUSH PRIVILEGES"
 
 
-## optimize netdata resources usage
-#echo 1 >/sys/kernel/mm/ksm/run
-#echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
+    ## optimize netdata resources usage
+    #echo 1 >/sys/kernel/mm/ksm/run
+    #echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
 
-## disable email notifigrep -cions
-sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /usr/lib/netdata/conf.d/health_alarm_notify.conf
-service netdata restart
+    ## disable email notifigrep -cions
+    sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /usr/lib/netdata/conf.d/health_alarm_notify.conf
+    service netdata restart
 
 } >> /tmp/registro.log 2>&1
 
@@ -784,13 +785,13 @@ service netdata restart
 echo -e "${CGREEN}Limpando php's versões anteriores...${CEND}"
 {
 
-if [ "$EE_CLEANUP" = "y" ]; then
+    if [ "$EE_CLEANUP" = "y" ]; then
 
-    apt-get -y autoremove php5.6-fpm php5.6-common --purge
-    apt-get -y autoremove php7.0-fpm php7.0-common --purge
-    apt-get -y autoremove php7.1-fpm php7.1-common --purge
-    cd ~
-fi
+        apt-get -y autoremove php5.6-fpm php5.6-common --purge
+        apt-get -y autoremove php7.0-fpm php7.0-common --purge
+        apt-get -y autoremove php7.1-fpm php7.1-common --purge
+        cd ~
+    fi
 
 } >> /tmp/registro.log 2>&1
 
@@ -805,7 +806,6 @@ fi
 
 ADDRESS=$(hostname -I | awk '{ print $1}')
 echo " "
-
 echo " Optimized Wordops was setup successfully! "
 echo " Painel Principal: https://$ADDRESS:22222"
 echo " Painel Netdata: https://$ADDRESS:22222/netdata"
