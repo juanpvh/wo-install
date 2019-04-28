@@ -170,7 +170,7 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         done
 	fi	
 		
-
+fi
 #adicionar swap
 
 fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
