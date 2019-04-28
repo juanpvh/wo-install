@@ -171,19 +171,31 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
 	fi	
 		
 fi
+
 #adicionar swap
+echo -e "${CGREEN}Adicionando memória swap...${CEND}"
+{
+    fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
 
-fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
-
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Adição de memória swap${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Adição de memória swap${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
 ###Pacotes do Sistemas Atualizados
 
 echo -e "${CGREEN}Atualizando Pacotes do Sistemas...${CEND}"
 [ -z "$TRAVIS_BUILD" ] && {
 
-    apt-get update
+    apt-get update -y 
+    apt-get upgrade -y
     apt-get dist-upgrade -y
-    apt-get autoremove -y --purge
-    apt-get autoclean -y
+    #apt-get autoremove -y --purge
+    #apt-get autoclean -y
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -370,7 +382,8 @@ echo -e "${CGREEN}Instalando WordOps...${CEND}"
 
         if [ ! -f $HOME/.gitconfig ]; then
             # define git username and email for non-interactive install
-            sudo bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
+            USER=MarcosToniatto
+            bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
         fi
 
         if [ ! -x /usr/local/bin/wo ]; then
@@ -737,6 +750,42 @@ echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
         echo ""
     else
         echo -e "${CRED}Instalação do EXTPLORER${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+###Instalando Mailhog e postfix
+echo -e "${CGREEN}Instalando Mailhog e postfix...${CEND}"
+{
+    mkdir -p /var/www/22222/htdocs/mail
+    wget -qO /var/www/22222/htdocs/mail/mailhog https://github.com/mailhog/MailHog/releases/download/v1.0.0/MailHog_linux_amd64
+    chmod +x /var/www/22222/htdocs/mail/mailhog
+
+cat >  /etc/systemd/system/mailhog.service << END
+[Unit]
+Description=MailHog service
+
+[Service]
+ExecStart=/usr/local/bin/mailhog
+
+[Install]
+WantedBy=multi-user.target
+END
+
+systemctl start mailhog
+systemctl enable mailhog
+
+
+debconf-set-selections <<< "postfix postfix/mailname string localhost"
+debconf-set-selections <<< "postfix postfix/main_mailer_type string 'smarthost'"
+apt-get install -y postfix
+
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação Mailhog e postfix${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação Mailhog e postfix${CEND}   [${CRED}FALHOU${CEND}]"
         echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
     fi
 ###
