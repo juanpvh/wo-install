@@ -33,8 +33,7 @@ CRED="${CSI}1;31m"
 
 [ -z "$(command -v sudo)" ] && { apt-get -y install sudo >>/dev/null 2>&1; }
 [ -z "$(command -v curl)" ] && { apt-get -y install curl >>/dev/null 2>&1; }
-{ apt-get -y remove monit --purge >>/dev/null 2>&1; }
-rm -rf /etc/monit/
+
 
 
 ##################################
@@ -112,7 +111,7 @@ fi
 echo ""
 echo "Bem Vindo ao script Wo-instal-pack."
 echo ""
-echo" -------------------------------------------------------------------------
+echo " -------------------------------------------------------------------------
         WO-INSTALL-PACK - Script de Instalação do WordOps
  -------------------------------------------------------------------------
  FORKED         Este script é um fork do:
@@ -162,7 +161,7 @@ if [ "$INTERACTIVE_SETUP" = "y" ]; then
         echo "#####################################"
         echo "MONIT"
         echo "#####################################"
-        echo "Voce quer instalar o ClamAV Monit ? (y/n)"
+        echo "Voce quer instalar o Monit ? (y/n)"
         while [[ $MONIT_INSTALL != "y" && $MONIT_INSTALL != "n" ]]; do
             read -p "Selecione a opção [y/n]: " 	MONIT_INSTALL
         done
@@ -399,7 +398,7 @@ echo -e "${CGREEN}Instalando WordOps...${CEND}"
 
             wget -qO wo wops.cc && sudo bash wo
             source /etc/bash_completion.d/wo_auto.rc
-            rm wo
+            rm -rf wo
 
 
         fi
@@ -762,48 +761,48 @@ echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
     fi
 ###
 
-###Instalando Mailhog e postfix
-echo -e "${CGREEN}Instalando Mailhog e postfix...${CEND}"
-{
-    wget -qO /var/www/22222/htdocs/mailhog.zip https://github.com/mailhog/MailHog/archive/master.zip
-    cd /var/www/22222/htdocs/ || exit 1
-    unzip mailhog.zip
-    rm -rf mailhog.zip
-    mv MailHog-master mailhog
-    chmod +x mailhog
-    cd || exit
-    chown -R www-data:www-data /var/www/22222/htdocs/
-	find /var/www/22222/htdocs/ -type f -exec chmod 644 {} +
-	find /var/www/22222/htdocs/ -type d -exec chmod 755 {} +
-
-cat >  /etc/systemd/system/mailhog.service << END
-[Unit]
-Description=MailHog service
-
-[Service]
-ExecStart=/usr/local/bin/mailhog
-
-[Install]
-WantedBy=multi-user.target
-END
-
-systemctl start mailhog
-systemctl enable mailhog
-
-
-debconf-set-selections <<< "postfix postfix/mailname string localhost"
-debconf-set-selections <<< "postfix postfix/main_mailer_type string 'smarthost'"
-apt-get install -y postfix
-
-} >> /tmp/registro.log 2>&1
-    if [ $? -eq 0 ]; then
-        echo -e "${CGREEN}Instalação Mailhog e postfix${CEND}   [${CGREEN}OK${CEND}]"
-        echo ""
-    else
-        echo -e "${CRED}Instalação Mailhog e postfix${CEND}   [${CRED}FALHOU${CEND}]"
-        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
-    fi
-###
+####Instalando Mailhog e postfix
+#echo -e "${CGREEN}Instalando Mailhog e postfix...${CEND}"
+#{
+#    wget -qO /var/www/22222/htdocs/mailhog.zip https://github.com/mailhog/MailHog/archive/master.zip
+#    cd /var/www/22222/htdocs/ || exit 1
+#    unzip mailhog.zip
+#    rm -rf mailhog.zip
+#    mv MailHog-master mailhog
+#    chmod +x mailhog
+#    cd || exit
+#    chown -R www-data:www-data /var/www/22222/htdocs/
+#	find /var/www/22222/htdocs/ -type f -exec chmod 644 {} +
+#	find /var/www/22222/htdocs/ -type d -exec chmod 755 {} +
+#
+#cat >  /etc/systemd/system/mailhog.service << END
+#[Unit]
+#Description=MailHog service
+#
+#[Service]
+#ExecStart=/usr/local/bin/mailhog
+#
+#[Install]
+#WantedBy=multi-user.target
+#END
+#
+#systemctl start mailhog
+#systemctl enable mailhog
+#
+#
+#debconf-set-selections <<< "postfix postfix/mailname string localhost"
+#debconf-set-selections <<< "postfix postfix/main_mailer_type string 'smarthost'"
+#apt-get install -y postfix
+#
+#} >> /tmp/registro.log 2>&1
+#    if [ $? -eq 0 ]; then
+#        echo -e "${CGREEN}Instalação Mailhog e postfix${CEND}   [${CGREEN}OK${CEND}]"
+#        echo ""
+#    else
+#        echo -e "${CRED}Instalação Mailhog e postfix${CEND}   [${CRED}FALHOU${CEND}]"
+#        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+#    fi
+####
 
 ###Instalando Script de otimização de imagens...
 echo -e "${CGREEN}Instalando script de otimização de imagens...${CEND}"
