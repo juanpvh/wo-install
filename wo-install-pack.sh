@@ -602,8 +602,6 @@ echo -e "${CGREEN}Instalando Monit...${CEND}"
     if [ "$MONIT_INSTALL" = "y" ]; then
 
 
-        if [ -z "$(command -v monit)" ]; then
-
             apt-get -y autoremove monit --purge
             rm -rf /etc/monit/
 	        apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev     autoconf bison libpam0g-dev
@@ -632,7 +630,6 @@ echo -e "${CGREEN}Instalando Monit...${CEND}"
 	        monit
 	        monit reload
 	
-        fi
     fi	
 
 } >> /tmp/registro.log 2>&1
@@ -768,9 +765,16 @@ echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
 ###Instalando Mailhog e postfix
 echo -e "${CGREEN}Instalando Mailhog e postfix...${CEND}"
 {
-    mkdir -p /var/www/22222/htdocs/mail
-    wget -qO /var/www/22222/htdocs/mail/mailhog https://github.com/mailhog/MailHog/releases/download/v1.0.0/MailHog_linux_amd64
-    chmod +x /var/www/22222/htdocs/mail/mailhog
+    wget -qO /var/www/22222/htdocs/mailhog.zip https://github.com/mailhog/MailHog/archive/master.zip
+    cd /var/www/22222/htdocs/ || exit 1
+    unzip mailhog.zip
+    rm -rf mailhog.zip
+    mv MailHog-master mailhog
+    chmod +x mailhog
+    cd || exit
+    chown -R www-data:www-data /var/www/22222/htdocs/
+	find /var/www/22222/htdocs/ -type f -exec chmod 644 {} +
+	find /var/www/22222/htdocs/ -type d -exec chmod 755 {} +
 
 cat >  /etc/systemd/system/mailhog.service << END
 [Unit]
