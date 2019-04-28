@@ -33,7 +33,7 @@ CRED="${CSI}1;31m"
 
 [ -z "$(command -v sudo)" ] && { apt-get -y install sudo >>/dev/null 2>&1; }
 [ -z "$(command -v curl)" ] && { apt-get -y install curl >>/dev/null 2>&1; }
-[ -z "$(command -v monit)" ] && { apt-get -y autoremove monit --purge >>/dev/null 2>&1; }
+{ apt-get -y remove monit --purge >>/dev/null 2>&1; }
 rm -rf /etc/monit/
 
 
@@ -199,12 +199,13 @@ echo -e "${CGREEN}Atualizando Pacotes do Sistemas...${CEND}"
 ###Instalação de Serviços Adicionais
 
  echo -e "${CGREEN}Instando Serviços Adicionais...${CEND}"
-{ sudo apt-get install haveged jpegoptim optipng webp curl mutt git unzip zip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux php7.2-intl php7.3-intl -y
-ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-dpkg-reconfigure --frontend noninteractive tzdata
+{
+    sudo apt-get install haveged jpegoptim optipng webp curl mutt git unzip zip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux php7.2-intl php7.3-intl -y
+    ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+    dpkg-reconfigure --frontend noninteractive tzdata
 
-# ntp time
-sudo systemctl enable ntp
+    # ntp time
+    sudo systemctl enable ntp
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -295,6 +296,8 @@ sudo ufw allow 22222
 
 # Netdata web interface
 sudo ufw allow 19999
+# Monit web interface
+sudo ufw allow 2812
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -389,25 +392,27 @@ echo -e "${CGREEN}Otimizando a configuração do mariadb...${CEND}"
 ###Instalação do WordOps
 ###############################################
 echo -e "${CGREEN}Instalando WordOps...${CEND}"
-if [ -z "$WO_PREVIOUS_INSTALL" ]; then
+{
+    if [ -z "$WO_PREVIOUS_INSTALL" ]; then
 
-    if [ ! -f $HOME/.gitconfig ]; then
-        # define git username and email for non-interactive install
-        sudo bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
+        if [ ! -f $HOME/.gitconfig ]; then
+            # define git username and email for non-interactive install
+            sudo bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
+        fi
+
+        if [ ! -x /usr/local/bin/wo ]; then
+
+            wget -qO wo wops.cc && sudo bash wo
+            source /etc/bash_completion.d/wo_auto.rc
+            rm wo
+            sudo cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf etc/nginx/conf.d/upstream.conf
+            sudo cp -f $HOME/wo-install/etc/nginx/sites-available/22222 etc/nginx/sites-available/22222
+            sudo cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
+            sudo cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
+
+        fi
     fi
-    if [ ! -x /usr/local/bin/wo ]; then
-
-        wget -qO wo wops.cc && sudo bash wo
-        source /etc/bash_completion.d/wo_auto.rc
-        rm wo
-    sudo cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf etc/nginx/conf.d/upstream.conf
-    sudo cp -f $HOME/wo-install/etc/nginx/sites-available/22222 etc/nginx/sites-available/22222
-    sudo cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
-    sudo cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
-
-    fi
-
-    } >> /tmp/registro.log 2>&1
+} >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
         echo -e "${CGREEN}Instalação do WordOps${CEND}   [${CGREEN}OK${CEND}]"
         echo ""
@@ -419,13 +424,12 @@ if [ -z "$WO_PREVIOUS_INSTALL" ]; then
 
 ###Instalando Pack adicional do WordOps
 echo -e "${CGREEN}Instalando pack do WordOps...${CEND}"
-
+{
 
     /usr/local/bin/wo stack install --all --php73 --redis --admin --phpredisadmin --memcached --redis --utils
-
 	
 
-    } >> /tmp/registro.log 2>&1
+} >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
         echo -e "${CGREEN}Instalação da pack do WordOps${CEND}   [${CGREEN}OK${CEND}]"
         echo ""
@@ -447,9 +451,9 @@ echo -e "${CGREEN}Configurando acesso www-data shell...${CEND}"
         sudo wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
  
   
-    #Customize WordPress installation locale
+        #Customize WordPress installation locale
 
-    sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
+        sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
 
     fi
 
@@ -482,51 +486,58 @@ echo -e "${CGREEN}Configurando acesso www-data shell...${CEND}"
 echo -e "${CGREEN}Compilando a Pilha Nginx-ee...${CEND}"
 {
 
-wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
-chmod +x $HOME/nginx-build.sh
+    wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
+    chmod +x $HOME/nginx-build.sh
+
+    #executando a pilha
+    $HOME/nginx-build.sh
 
 } >> /tmp/registro.log 2>&1
-
-#executando a pilha
-$HOME/nginx-build.sh
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Pilha Nginx-ee Instalada${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Pilha Nginx-ee${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
 ###
 
 ###Configuração adicional nginx, logrotate, fail2ban...
 echo -e "${CGREEN}Configuração adicional nginx, logrotate, fail2ban...${CEND}"
 {
 
-# optimized nginx.config
-#cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+    # optimized nginx.config
+    #cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
-# commit changes
-git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
-
-
-# reduce nginx logs rotation
-sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
-sed -i 's/rotate 52/rotate 4/' /etc/logrotate.d/nginx
+    # commit changes
+    git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
 
 
+    # reduce nginx logs rotation
+    sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
+    sed -i 's/rotate 52/rotate 4/' /etc/logrotate.d/nginx
 
-# commit changes
-git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update nginx.conf and setup cloudflare visitor real IP restore"
 
 
-VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
+    # commit changes
+    git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update nginx.conf and setup cloudflare visitor real IP restore"
 
-if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-    sudo service nginx reload
-else
 
-    echo "Nginx configuration is not correct"
+    VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 
-fi
+    if [ -z "$VERIFY_NGINX_CONFIG" ]; then
+        sudo service nginx reload
+    else
 
-# Add fail2ban configurations
-cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
-cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
+        echo "Nginx configuration is not correct"
 
-fail2ban-client reload
+    fi
+
+    # Add fail2ban configurations
+    cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
+    cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
+
+    fail2ban-client reload
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -541,16 +552,16 @@ fail2ban-client reload
 ###Instalando Clamav...
 echo -e "${CGREEN}Instalando Clamav...${CEND}"
 {
-if [ "$CLAMAV_INSTALL" = "y" ]; then
+    if [ "$CLAMAV_INSTALL" = "y" ]; then
 
-    if [ -z "$(command -v clamscan)" ]; then
-        apt-get install clamav clamav-daemon -y
+        if [ -z "$(command -v clamscan)" ]; then
+            apt-get install clamav clamav-daemon -y
+        fi
+
+        /etc/init.d/clamav-freshclam stop
+        freshclam
+        /etc/init.d/clamav-freshclam start
     fi
-
-    /etc/init.d/clamav-freshclam stop
-    freshclam
-    /etc/init.d/clamav-freshclam start
-fi
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -566,41 +577,41 @@ fi
 echo -e "${CGREEN}Instalando Monit...${CEND}"
 {
     
-if [ "$MONIT_INSTALL" = "y" ]; then
+    if [ "$MONIT_INSTALL" = "y" ]; then
 
 
-    if [ -z "$(command -v monit)" ]; then
+        if [ -z "$(command -v monit)" ]; then
 
-    apt-get -y autoremove monit --purge
-    rm -rf /etc/monit/
-	apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev autoconf bison libpam0g-dev
-	cd ~
-	wget https://mmonit.com/monit/dist/monit-5.25.2.tar.gz
-	tar zxvf monit-*.tar.gz
-	rm -rf monit-5.25.2.tar.gz
-	cd monit-*
-	./bootstrap
-	./configure
-	make && make install
-	mkdir /etc/monit/
-	mkdir /etc/monit/monit.d/
-	mkdir /etc/monit/conf-enable/
-	cd ~
-	cp -rf $HOME/wo-install/etc/monitrc /etc/
-	chmod 0600 /etc/monitrc
-	ln -s /etc/monitrc /etc/monit/monitrc
-#regras
-	cp -rf $HOME/wo-install/etc/monit/monit.d/* /etc/monit/monit.d/
-	cp -rf $PWD/wo-install/etc/monit.service /lib/systemd/system/monit.service
-	systemctl enable monit
+            apt-get -y autoremove monit --purge
+            rm -rf /etc/monit/
+	        apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev     autoconf bison libpam0g-dev
+	        cd ~
+	        wget https://mmonit.com/monit/dist/monit-5.25.2.tar.gz
+	        tar zxvf monit-*.tar.gz
+	        rm -rf monit-5.25.2.tar.gz
+	        cd monit-*
+	        ./bootstrap
+	        ./configure
+	        make && make install
+	        mkdir /etc/monit/
+	        mkdir /etc/monit/monit.d/
+	        mkdir /etc/monit/conf-enable/
+	        cd ~
+	        cp -rf $HOME/wo-install/etc/monitrc /etc/
+	        chmod 0600 /etc/monitrc
+	        ln -s /etc/monitrc /etc/monit/monitrc
+            #regras
+	        cp -rf $HOME/wo-install/etc/monit/monit.d/* /etc/monit/monit.d/
+	        cp -rf $PWD/wo-install/etc/monit.service /lib/systemd/system/monit.service
+	        systemctl enable monit
 
-#linkar
-	ln -s /etc/monit/monit.d/* /etc/monit/conf-enable/
-	monit
-	monit reload
+            #linkar
+	        ln -s /etc/monit/monit.d/* /etc/monit/conf-enable/
+	        monit
+	        monit reload
 	
-    fi
-fi	
+        fi
+    fi	
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -669,35 +680,31 @@ chmod +x mysqldump.sh
 ###Instalando ProFTPd...
 echo -e "${CGREEN}Instalando ProFTPd...${CEND}"
 {
-if [ "$PROFTPD_INSTALL" = "y" ]; then
+    if [ "$PROFTPD_INSTALL" = "y" ]; then
 
-    echo "##########################################"
-    echo " Installing Proftpd"
-    echo "##########################################"
+        apt-get install proftpd -y
 
-    apt-get install proftpd -y
+        # secure proftpd and enable PassivePorts
 
-    # secure proftpd and enable PassivePorts
+        sed -i 's/# DefaultRoot/DefaultRoot/' /etc/proftpd/proftpd.conf
+        sed -i 's/# RequireValidShell/RequireValidShell/' /etc/proftpd/proftpd.conf
+        sed -i 's/# PassivePorts                  49152 65534/PassivePorts                  49000 50000/' /etc/ proftpd/proftpd.conf
 
-    sed -i 's/# DefaultRoot/DefaultRoot/' /etc/proftpd/proftpd.conf
-    sed -i 's/# RequireValidShell/RequireValidShell/' /etc/proftpd/proftpd.conf
-    sed -i 's/# PassivePorts                  49152 65534/PassivePorts                  49000 50000/' /etc/proftpd/proftpd.conf
+        sudo service proftpd restart
 
-    sudo service proftpd restart
+        if [ -d /etc/ufw ]; then
+            # ftp active port
+            sudo ufw allow 21
+            # ftp passive ports
+            sudo ufw allow 49000:50000/tcp
+        fi
 
-    if [ -d /etc/ufw ]; then
-        # ftp active port
-        sudo ufw allow 21
-        # ftp passive ports
-        sudo ufw allow 49000:50000/tcp
+        if [ -d /etc/fail2ban ]; then
+            echo -e '\n[proftpd]\nenabled = true\n' >> /etc/fail2ban/jail.d/custom.conf
+            fail2ban-client reload
+
+        fi
     fi
-
-    if [ -d /etc/fail2ban ]; then
-        echo -e '\n[proftpd]\nenabled = true\n' >> /etc/fail2ban/jail.d/custom.conf
-        fail2ban-client reload
-
-    fi
-fi
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -712,20 +719,20 @@ fi
 ###Instalando EXTPLORER...
 echo -e "${CGREEN}Instalando EXTPLORER...${CEND}"
 {
-if [ "$WO_EXTPLORER_INSTALL" = "y" ]; then
+    if [ "$WO_EXTPLORER_INSTALL" = "y" ]; then
 
-    if [ ! -d /var/www/22222/htdocs/files ]; then
+        if [ ! -d /var/www/22222/htdocs/files ]; then
 
-        mkdir -p /var/www/22222/htdocs/files
-        wget -qO /var/www/22222/htdocs/files/ex.zip https://extplorer.net/attachments/download/78/eXtplorer_2.1.12.zip
-        cd /var/www/22222/htdocs/files || exit 1
-        unzip ex.zip
-        rm ex.zip
+            mkdir -p /var/www/22222/htdocs/files
+            wget -qO /var/www/22222/htdocs/files/ex.zip https://extplorer.net/attachments/download/78/eXtplorer_2.1.12.zip
+            cd /var/www/22222/htdocs/files || exit 1
+            unzip ex.zip
+            rm ex.zip
+        fi
+
+        cd /var/www/22222 || exit
+
     fi
-
-    cd /var/www/22222 || exit
-
-fi
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
         echo -e "${CGREEN}Instalação do EXTPLORER${CEND}   [${CGREEN}OK${CEND}]"
@@ -800,7 +807,7 @@ ADDRESS=$(hostname -I | awk '{ print $1}')
 echo " "
 
 echo " Optimized Wordops was setup successfully! "
-echo " Dashboard https://$ADDRESS:22222"
-echo " Dashboard https://$ADDRESS:22222/netdata"
-echo " Dashboard https://$ADDRESS:22222/monit"
+echo " Painel Principal: https://$ADDRESS:22222"
+echo " Painel Netdata: https://$ADDRESS:22222/netdata"
+echo " Painel Monit: https://$ADDRESS:22222/monit"
 echo " "
