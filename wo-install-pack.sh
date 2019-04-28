@@ -180,10 +180,10 @@ fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /
 echo -e "${CGREEN}Atualizando Pacotes do Sistemas...${CEND}"
 [ -z "$TRAVIS_BUILD" ] && {
 
-    sudo apt-get update
-    sudo apt-get dist-upgrade -y
-    sudo apt-get autoremove -y --purge
-    sudo apt-get autoclean -y
+    apt-get update
+    apt-get dist-upgrade -y
+    apt-get autoremove -y --purge
+    apt-get autoclean -y
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -200,7 +200,7 @@ echo -e "${CGREEN}Atualizando Pacotes do Sistemas...${CEND}"
 
  echo -e "${CGREEN}Instando Serviços Adicionais...${CEND}"
 {
-    sudo apt-get install haveged jpegoptim optipng webp curl mutt git unzip zip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux php7.2-intl php7.3-intl -y
+    apt-get install haveged jpegoptim optipng webp curl mutt git zip unzip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux -y
     ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
     dpkg-reconfigure --frontend noninteractive tzdata
 
@@ -361,6 +361,57 @@ echo -e "${CGREEN}Otimizando Sysctl tweaks +  open_files limits...${CEND}"
     fi
 ###
 
+################################################
+###Instalação do WordOps
+###############################################
+echo -e "${CGREEN}Instalando WordOps...${CEND}"
+{
+    if [ -z "$WO_PREVIOUS_INSTALL" ]; then
+
+        if [ ! -f $HOME/.gitconfig ]; then
+            # define git username and email for non-interactive install
+            sudo bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
+        fi
+
+        if [ ! -x /usr/local/bin/wo ]; then
+
+            wget -qO wo wops.cc && sudo bash wo
+            source /etc/bash_completion.d/wo_auto.rc
+            rm wo
+            cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
+            cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
+            cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
+            cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
+
+        fi
+    fi
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação do WordOps${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação do WordOps${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
+###Instalando Pack adicional do WordOps
+echo -e "${CGREEN}Instalando pack do WordOps...${CEND}"
+{
+
+    /usr/local/bin/wo stack install --all --php73 --redis --admin --phpredisadmin --memcached --redis --utils
+	apt-get install php7.2-intl php7.3-intl -y
+
+} >> /tmp/registro.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${CGREEN}Instalação da pack do WordOps${CEND}   [${CGREEN}OK${CEND}]"
+        echo ""
+    else
+        echo -e "${CRED}Instalação da pack do WordOps${CEND}   [${CRED}FALHOU${CEND}]"
+        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
+    fi
+###
+
 ###Otimizando a configuração do mariadb
 echo -e "${CGREEN}Otimizando a configuração do mariadb...${CEND}"
 {
@@ -384,57 +435,6 @@ echo -e "${CGREEN}Otimizando a configuração do mariadb...${CEND}"
         echo ""
     else
         echo -e "${CRED}Otimização da configuração do mariaDB${CEND}   [${CRED}FALHOU${CEND}]"
-        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
-    fi
-###
-
-################################################
-###Instalação do WordOps
-###############################################
-echo -e "${CGREEN}Instalando WordOps...${CEND}"
-{
-    if [ -z "$WO_PREVIOUS_INSTALL" ]; then
-
-        if [ ! -f $HOME/.gitconfig ]; then
-            # define git username and email for non-interactive install
-            sudo bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
-        fi
-
-        if [ ! -x /usr/local/bin/wo ]; then
-
-            wget -qO wo wops.cc && sudo bash wo
-            source /etc/bash_completion.d/wo_auto.rc
-            rm wo
-            sudo cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf etc/nginx/conf.d/upstream.conf
-            sudo cp -f $HOME/wo-install/etc/nginx/sites-available/22222 etc/nginx/sites-available/22222
-            sudo cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
-            sudo cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
-
-        fi
-    fi
-} >> /tmp/registro.log 2>&1
-    if [ $? -eq 0 ]; then
-        echo -e "${CGREEN}Instalação do WordOps${CEND}   [${CGREEN}OK${CEND}]"
-        echo ""
-    else
-        echo -e "${CRED}Instalação do WordOps${CEND}   [${CRED}FALHOU${CEND}]"
-        echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
-    fi
-###
-
-###Instalando Pack adicional do WordOps
-echo -e "${CGREEN}Instalando pack do WordOps...${CEND}"
-{
-
-    /usr/local/bin/wo stack install --all --php73 --redis --admin --phpredisadmin --memcached --redis --utils
-	
-
-} >> /tmp/registro.log 2>&1
-    if [ $? -eq 0 ]; then
-        echo -e "${CGREEN}Instalação da pack do WordOps${CEND}   [${CGREEN}OK${CEND}]"
-        echo ""
-    else
-        echo -e "${CRED}Instalação da pack do WordOps${CEND}   [${CRED}FALHOU${CEND}]"
         echo -e "${CRED}Verifique o arquivo /tmp/registro.log${CEND}"
     fi
 ###
@@ -463,12 +463,10 @@ echo -e "${CGREEN}Configurando acesso www-data shell...${CEND}"
         cp -f $HOME/wo-install/var/www/.bashrc /var/www/.bashrc
 
         # set www-data as owner
-        sudo chown www-data:www-data /var/www/.profile
-        sudo chown www-data:www-data /var/www/.bashrc
+        chown www-data:www-data /var/www/.profile
+        chown www-data:www-data /var/www/.bashrc
     fi
 
-    # install nanorc for www-data
-    sudo -u www-data -H curl https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh | sh
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -658,9 +656,8 @@ echo -e "${CGREEN}Instalando Monit...${CEND}"
 #echo -e "${CGREEN}Instalando Nanorc...${CEND}"
 {
 
-    wget -O nanorc.sh https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh
-    chmod +x nanorc.sh  
-    ./nanorc.sh
+    chmod +x $HOME/wo-install/var/www/nanorc.sh
+    bash $HOME/wo-install/var/www/nanorc.sh
 
     wget -O mysqldump.sh virtubox.net/mysqldump
     chmod +x mysqldump.sh
@@ -756,7 +753,7 @@ echo -e "${CGREEN}Instalando script de otimização de imagens...${CEND}"
     # create a database user called “netdata”
     ##################################
 
-    #mysql -e "CREATE USER 'netdata'@'localhost'" > /dev/null 2>&1
+    #mysql -e "create user 'netdata'@'localhost';" > /dev/null 2>&1
     #mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
     #mysql -e "FLUSH PRIVILEGES"
 
