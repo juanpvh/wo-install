@@ -112,6 +112,15 @@ fi
 echo ""
 echo "Bem Vindo ao script Wo-instal-pack."
 echo ""
+echo" -------------------------------------------------------------------------
+        WO-INSTALL-PACK - Script de Instalação do WordOps
+ -------------------------------------------------------------------------
+ FORKED         Este script é um fork do:
+ GitHub:        https://github.com/VirtuBox/wo-nginx-setup
+ Licença M.I.T
+ -------------------------------------------------------------------------
+ Version 1.0 - 04/2019
+ -------------------------------------------------------------------------"
 
 [ -d /etc/wo ] && {
     WO_PREVIOUS_INSTALL=1
@@ -391,10 +400,7 @@ echo -e "${CGREEN}Instalando WordOps...${CEND}"
             wget -qO wo wops.cc && sudo bash wo
             source /etc/bash_completion.d/wo_auto.rc
             rm wo
-            cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
-            cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
-            cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
-            cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
+
 
         fi
     fi
@@ -502,6 +508,11 @@ echo -e "${CGREEN}Compilando a Pilha Nginx-ee...${CEND}"
 
     #executando a pilha
     $HOME/nginx-build.sh
+
+        cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
+        cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
+        cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
+        cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
 
 } >> /tmp/registro.log 2>&1
     if [ $? -eq 0 ]; then
@@ -812,7 +823,7 @@ echo -e "${CGREEN}Instalando script de otimização de imagens...${CEND}"
     #echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
 
     ## disable email notifigrep -cions
-    sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /usr/lib/netdata/conf.d/health_alarm_notify.conf
+    sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /opt/netdata/usr/lib/netdata/conf.d/health_alarm_notify.conf
     service netdata restart
 
 } >> /tmp/registro.log 2>&1
