@@ -206,7 +206,7 @@ fi
     else
 
     # define git username and email for non-interactive install
-        USER=MarcosToniatto
+    
         bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
     fi
 
@@ -336,19 +336,19 @@ fi
 ###
 
 ###Instalando Clamav...
-
-    if [ -f /usr/bin/clamscan ]; then
-
-        echo "Clamav instalado"
-    else
-
-        apt-get install clamav clamav-daemon -y
-        /etc/init.d/clamav-freshclam stop
-        freshclam
-        /etc/init.d/clamav-freshclam start
-
-    fi
-
+#
+#    if [ -f /usr/bin/clamscan ]; then
+#
+#        echo "Clamav instalado"
+#    else
+#
+#        apt-get install clamav clamav-daemon -y
+#        /etc/init.d/clamav-freshclam stop
+#        freshclam
+#        /etc/init.d/clamav-freshclam start
+#
+#    fi
+#
 ###
 
 ###Instalando Monit...
