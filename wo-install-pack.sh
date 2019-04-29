@@ -518,6 +518,7 @@ fi
         apt-get -y autoremove php7.0-fpm php7.0-common --purge
         apt-get -y autoremove php7.1-fpm php7.1-common --purge
         cd ~
+        rm -rf wo-install nginx-build.sh wo-install-pack.sh
 
 ###
 clear
