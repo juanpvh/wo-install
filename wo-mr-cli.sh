@@ -287,7 +287,7 @@ if [[ "$RESTORE_ALL" == "yes" ]]; then
 		# ADCIONANDO BACKUP.
 		rsync -azh --info=progress2 --stats --human-readable $BACKUPPATH/$SITE/files/* $SITESTORE/$SITE
 		
-		wp plugin delete --path=$SITESTORE/$SITE/htdocs/ {nginx-helper,w3-total-cache} --allow-root
+		#wp plugin delete --path=$SITESTORE/$SITE/htdocs/ {nginx-helper,w3-total-cache} --allow-root
 
 		echo "——————————————————————————————————"
 		echo "⏲  Restaurando banco de dados..."

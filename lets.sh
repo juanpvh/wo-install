@@ -15,7 +15,8 @@ for dominio in ${SITELIST[@]}; do
 
 
 	
-	wo site update $dominio --wpfc --le
+	wo site update $dominio --wpfc
+  wo site update $dominio --le
 	
   fi
 
