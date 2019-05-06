@@ -226,8 +226,9 @@ fi
 
 ###Instalando Pack adicional do WordOps
     if [ -e /usr/local/bin/wo ]; then
-    
-        /usr/local/bin/wo stack install --php73 --redis --admin --phpredisadmin --memcached --redis --utils
+
+        /usr/local/bin/wo stack install
+        /usr/local/bin/wo stack install --php73 --admin --phpredisadmin --memcached --redis --utils
 	    apt-get install php7.2-intl php7.3-intl -y
     
     fi
