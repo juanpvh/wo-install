@@ -227,7 +227,7 @@ fi
 ###Instalando Pack adicional do WordOps
     if [ -e /usr/local/bin/wo ]; then
     
-        /usr/local/bin/wo stack install --all --php73 --redis --admin --phpredisadmin --memcached --redis --utils
+        /usr/local/bin/wo stack install --php73 --redis --admin --phpredisadmin --memcached --redis --utils
 	    apt-get install php7.2-intl php7.3-intl -y
     
     fi
@@ -238,10 +238,10 @@ fi
 
         cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
         # stop mysql service to apply new InnoDB log file size
-        sudo service mysql stop
+        service mysql stop
         # mv previous log file
-        sudo mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
-        sudo mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
+        mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
+        mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
         # increase mariadb open_files_limit
         cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
         # reload daemon
@@ -285,11 +285,7 @@ fi
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
-        wget -O $HOME/nginx-build.sh vtb.cx/nginx-ee
-        chmod +x $HOME/nginx-build.sh
-
-        #executando a pilha
-        $HOME/nginx-build.sh
+        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --full
 
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
@@ -457,26 +453,6 @@ fi
 
 ###
 
-###Instalando EXTPLORER...
-
-        if [ -d /var/www/22222/htdocs/files ]; then
-
-            echo "EXTPLORER Instalado"
-
-        else
-
-            mkdir -p /var/www/22222/htdocs/files
-            wget -qO /var/www/22222/htdocs/files/ex.zip https://extplorer.net/attachments/download/78/eXtplorer_2.1.12.zip
-            cd /var/www/22222/htdocs/files || exit 1
-            unzip ex.zip
-            rm ex.zip
-        fi
-
-        cd || exit
-
-
-
-###
 
 ####Instalando Postfix
 
@@ -506,8 +482,8 @@ fi
     #echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
 
     ## disable email notifigrep -cions
-    sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /opt/netdata/usr/lib/netdata/conf.d/health_alarm_notify.conf
-    service netdata restart
+    #sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /opt/netdata/usr/lib/netdata/conf.d/health_alarm_notify.conf
+    #service netdata restart
 
 ###
 
