@@ -93,15 +93,10 @@ echo -e "${CGREEN}
 
 ###Clonando repositorio
 
-    if [ -d $HOME/wo-install ]; then
-
-        git -C $HOME/wo-install pull origin master
-
-    else
     
-        git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install
+    git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install || git -C $HOME/wo-install pull origin master
         
-    fi
+
 
 ###
 
