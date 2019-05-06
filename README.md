@@ -9,6 +9,12 @@ Itens que serão integrados ao script
 
 vamos la!
 
+# define git username and email for non-interactive install
+    
+```
+bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
+```
+
 ### Instalando:
 
 ```
