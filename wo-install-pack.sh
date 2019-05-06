@@ -270,7 +270,7 @@ fi
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
-        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee)
+        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable
 
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
@@ -282,7 +282,7 @@ fi
 ###Configuração adicional nginx, logrotate, fail2ban...
 
     # optimized nginx.config
-    #cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+    cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
     # commit changes
     git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
