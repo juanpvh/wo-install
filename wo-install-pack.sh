@@ -202,7 +202,7 @@ fi
 
     # define git username and email for non-interactive install
     
-        bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
+        #bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gitconfig'
     fi
 
     if [ -e /usr/local/bin/wo ]; then
