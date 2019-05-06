@@ -21,5 +21,15 @@ bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gi
 wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-install-pack.sh && chmod +x wo-install-pack.sh && clear && ./wo-install-pack.sh
 ```
 
+### Outros:
+
+```
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-mr-cli.sh && chmod +x wo-mr-cli.sh && clear && ./wo-mr-cli.sh
+```
+
+```
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/lets.sh && chmod +x lets && clear && ./lets.sh
+```
+
 
 
