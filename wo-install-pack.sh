@@ -281,7 +281,7 @@ fi
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
-        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --full
+        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee)
 
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
