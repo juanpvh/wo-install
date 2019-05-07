@@ -186,7 +186,7 @@ fi
         echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
     } >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
 
-    sudo sysctl -e -p /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+    sysctl -e -p /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
 
 ###
 
@@ -270,7 +270,7 @@ fi
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
-        #bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable
+        #bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --full
 
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
