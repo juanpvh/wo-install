@@ -116,6 +116,8 @@ if [[ "$SIGLE_MIGRATION" == "yes" ]]; then
 	echo "——————————————————————————————————"
 
 	# Back up the WordPress database.
+	wp db repair --path=$SITESTORE/$SITE/htdocs/ --allow-root
+	wp db optimize --path=$SITESTORE/$SITE/htdocs/ --allow-root
 	wp db export $BACKUPPATH/$SITE_NAME/$SITE_NAME.sql --allow-root --path=$SITESTORE/$SITE_NAME/htdocs
 	tar -czf $BACKUPPATH/$SITE_NAME/$SITE_NAME.sql.gz $BACKUPPATH/$SITE_NAME/$SITE_NAME.sql
 	rm $BACKUPPATH/$SITE_NAME/$SITE_NAME.sql

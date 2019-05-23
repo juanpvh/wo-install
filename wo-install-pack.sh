@@ -82,7 +82,7 @@ echo -e "${CGREEN}
 
 ### ntp time
 
-    sudo systemctl enable ntp
+    systemctl enable ntp
 
 ###
 
@@ -102,13 +102,7 @@ echo -e "${CGREEN}
 
 ###Instalando firewall - ufw
 
-if [ -e /usr/sbin/ufw ]; then
-
-    echo "Firewall-UFW Instalado"
-
-else
- 
-    sudo apt-get install ufw -y
+    apt-get install ufw -y
  
     ###Difinindo regras do firewall - ufw
 
@@ -118,27 +112,31 @@ else
     ufw allow 22
     # custom ssh port
     if [ "$CURRENT_SSH_PORT" != "22" ]; then
-        sudo ufw allow "$CURRENT_SSH_PORT"
+        ufw allow "$CURRENT_SSH_PORT"
     fi
     # dns
-    sudo ufw allow 53
+    ufw allow 53
     # nginx
-    sudo ufw allow http
-    sudo ufw allow https
+    ufw allow http
+    ufw allow https
     # ntp
-    sudo ufw allow 123
+    ufw allow 123
     # dhcp client
-    sudo ufw allow 68
+    ufw allow 68
     # dhcp ipv6 client
-    sudo ufw allow 546
+    ufw allow 546
     # rsync
-    sudo ufw allow 873
+    ufw allow 873
     # easyengine backend
-    sudo ufw allow 22222
+    ufw allow 22222
     # Netdata web interface
-    sudo ufw allow 19999
+    ufw allow 19999
     # Monit web interface
-    sudo ufw allow 2812
+    ufw allow 2812
+    # ftp active port
+    ufw allow 21
+    # ftp passive ports
+    ufw allow 49000:50000/tcp
 fi
 ###
 
@@ -200,7 +198,7 @@ fi
 
     else
 
-        wget -qO wo wops.cc && sudo bash wo
+        wget -qO wo wops.cc && bash wo
         source /etc/bash_completion.d/wo_auto.rc
         rm -rf wo
     
@@ -244,12 +242,12 @@ fi
 
     if [ ! -f /etc/bash_completion.d/wp-completion.bash ]; then
         # download wp-cli bash-completion
-        sudo wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
+        wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
  
   
         #Customize WordPress installation locale
 
-        sudo cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
+         cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
 
     fi
 
@@ -301,7 +299,7 @@ fi
     VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
 
     if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-        sudo service nginx reload
+         service nginx reload
     else
 
         echo "Nginx configuration is not correct"
@@ -363,6 +361,10 @@ fi
         systemctl enable monit
         #linkar
         ln -s /etc/monit/monit.d/* /etc/monit/conf-enable/
+
+        mysql -e "create user 'monit'@'localhost' IDENTIFIED BY 'mysecretpassword';" > /dev/null 2>&1
+        mysql -e "FLUSH PRIVILEGES"
+
         monit
         monit reload
 
@@ -420,13 +422,13 @@ fi
         sed -i 's/# RequireValidShell/RequireValidShell/' /etc/proftpd/proftpd.conf
         sed -i 's/# PassivePorts                  49152 65534/PassivePorts                  49000 50000/' /etc/ proftpd/proftpd.conf
 
-        sudo service proftpd restart
+         service proftpd restart
 
         if [ -d /etc/ufw ]; then
             # ftp active port
-            sudo ufw allow 21
+             ufw allow 21
             # ftp passive ports
-            sudo ufw allow 49000:50000/tcp
+             ufw allow 49000:50000/tcp
         fi
 
         if [ -d /etc/fail2ban ]; then
