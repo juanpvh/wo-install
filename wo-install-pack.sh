@@ -110,10 +110,6 @@ echo -e "${CGREEN}
     ufw default allow outgoing
     ufw default deny incoming
     ufw allow 22
-    # custom ssh port
-    if [ "$CURRENT_SSH_PORT" != "22" ]; then
-        ufw allow "$CURRENT_SSH_PORT"
-    fi
     # dns
     ufw allow 53
     # nginx
@@ -137,7 +133,7 @@ echo -e "${CGREEN}
     ufw allow 21
     # ftp passive ports
     ufw allow 49000:50000/tcp
-fi
+
 ###
 
 ###Otimizando Sysctl tweaks +  open_files limits
