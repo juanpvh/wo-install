@@ -194,7 +194,7 @@ echo -e "${CGREEN}
 
     else
 
-        wget -qO wo wops.cc && bash wo
+        wget -qO wo wops.cc && sudo bash wo
         source /etc/bash_completion.d/wo_auto.rc
         rm -rf wo
     
