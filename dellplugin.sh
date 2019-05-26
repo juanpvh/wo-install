@@ -6,7 +6,7 @@ NC='\e[0m'
 DIR=$(ls -1L /var/www -I22222 -Ihtml) 
  
 #Loop para instalar o plugin em todos os diretorios encontrados
-for dominio in ${DIR[@]}; d
+for dominio in ${DIR[@]};
  	
 	cd /var/www/$dominio/htdocs/wp-content/plugins/
 	wp --allow-root plugin delete mainwp-child
