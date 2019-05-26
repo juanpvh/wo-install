@@ -31,5 +31,13 @@ wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-mr-cli.sh &&
 wget https://raw.githubusercontent.com/juanpvh/wo-install/master/lets.sh && chmod +x lets && clear && ./lets.sh
 ```
 
+```
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/installplugin.sh && chmod +x installplugin.sh && clear && ./installplugin.sh
+```
+
+```
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/dellplugin.sh && chmod +x dellplugin.sh && clear && ./dellplugin.sh
+```
+
 
 
