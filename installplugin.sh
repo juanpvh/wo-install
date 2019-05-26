@@ -17,5 +17,5 @@ for dominio in ${DIR[@]};
 done
 #
 cd ~ 
-rm -rf install-mwc.sh
+rm -rf installplugin.sh
 
