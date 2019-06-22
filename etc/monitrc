@@ -25,7 +25,7 @@ Monit.
 }
 #set mailserver smtp.gmail.com port 587
 #username "email" password "senha"
-#using TLSV1 with timeout 30 seconds
+#using tls with timeout 30 seconds
 #set alert emailalert
 
 

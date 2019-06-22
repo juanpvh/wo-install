@@ -75,7 +75,7 @@ echo -e "${CGREEN}
 
 ###Instalação de Serviços Adicionais
 
-    apt-get install haveged jpegoptim optipng webp curl mutt git zip unzip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen tmux -y
+    apt-get install haveged jpegoptim optipng webp curl mutt git zip unzip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen -y
     ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
     dpkg-reconfigure --frontend noninteractive tzdata
 ###
@@ -136,12 +136,6 @@ echo -e "${CGREEN}
 
 ###
 
-###Otimizando Sysctl tweaks +  open_files limits
-
-    cp -f $HOME/wo-install/etc/sysctl.d/60-ubuntu-nginx-web-server.conf /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
-    cp -f $HOME/wo-install/etc/security/limits.conf /etc/security/limits.conf
-
-###
 
 ### Redis transparent_hugepage
 
@@ -153,7 +147,7 @@ echo -e "${CGREEN}
 
     if [ ! -x /usr/bin/docker ]; then
 
-        echo "" >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+        echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
         {
             echo "# Disables packet forwarding"
             echo "net.ipv4.ip_forward = 0"
@@ -161,7 +155,7 @@ echo -e "${CGREEN}
             echo "net.ipv4.conf.default.forwarding = 0"
             echo "net.ipv6.conf.all.forwarding = 0"
             echo "net.ipv6.conf.default.forwarding = 0"
-        } >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+        } >>/etc/sysctl.d/60-wo-tweaks.conf
 
     fi
 
@@ -170,7 +164,7 @@ echo -e "${CGREEN}
     # for each interface found, add the following configuration to sysctl
 
     NET_INTERFACES_WAN=$(ip -4 route get 8.8.8.8 | grep -oP "dev [^[:space:]]+ " | cut -d ' ' -f 2)
-    echo "" >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+    echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
     {
         echo "# do not autoconfigure IPv6 on $NET_INTERFACES_WAN"
         echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
@@ -178,9 +172,9 @@ echo -e "${CGREEN}
         echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
         echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
         echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
-    } >>/etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+    } >>/etc/sysctl.d/60-wo-tweaks.conf
 
-    sysctl -e -p /etc/sysctl.d/60-ubuntu-nginx-web-server.conf
+    sysctl -e -p /etc/sysctl.d/60-wo-tweaks.conf
 
 ###
 
@@ -206,8 +200,9 @@ echo -e "${CGREEN}
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
-        /usr/local/bin/wo stack install --php73 --admin --phpredisadmin --memcached --redis --utils
-	    apt-get install php7.2-intl php7.3-intl -y
+        /usr/local/bin/wo stack install --phpredisadmin
+	    apt-get install php7.2-intl
+       
     
     fi
 ###
@@ -264,7 +259,7 @@ echo -e "${CGREEN}
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
-        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --full
+        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
 
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
@@ -285,11 +280,6 @@ echo -e "${CGREEN}
     # reduce nginx logs rotation
     sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
     sed -i 's/rotate 52/rotate 4/' /etc/logrotate.d/nginx
-
-
-
-    # commit changes
-    git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update nginx.conf and setup cloudflare visitor real IP restore"
 
 
     VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
@@ -329,7 +319,7 @@ echo -e "${CGREEN}
 ###Instalando Monit...
     if [ -f /usr/local/bin/monit ]; then
 
-        echo "Monit Instaldo"
+        echo "Monit Instalando"
 
     else
 
@@ -363,6 +353,8 @@ echo -e "${CGREEN}
 
         monit
         monit reload
+
+        
 
     fi
 	
@@ -447,29 +439,14 @@ echo -e "${CGREEN}
 
 ###Instalando Script de otimização de imagens...
 
-    cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
     cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
     chmod +x /etc/cron.weekly/jpg-png-cron
 
-    ##################################
-    # create a database user called “netdata”
-    ##################################
+ 
 
-    #mysql -e "create user 'netdata'@'localhost';" > /dev/null 2>&1
-    #mysql -e "GRANT USAGE on *.* to 'netdata'@'localhost'" > /dev/null 2>&1
-    #mysql -e "FLUSH PRIVILEGES"
-
-
-    ## optimize netdata resources usage
-    #echo 1 >/sys/kernel/mm/ksm/run
-    #echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
-
-    ## disable email notifigrep -cions
-    #sed -i 's/SEND_EMAIL="YES"/SEND_EMAIL="NO"/' /opt/netdata/usr/lib/netdata/conf.d/health_alarm_notify.conf
-    #service netdata restart
-
-###
-
+#ATIVANDO FIREWALL
+ufw enable
+ufw reload
 
 ###Limpando Instalação...
 
@@ -481,29 +458,12 @@ echo -e "${CGREEN}
 
 ###
 clear
-echo -e "${CGREEN}Verificando Instalação...${CEND}   [${CGREEN}OK${CEND}]"
-sleep 3
+
 [ -f /usr/local/bin/wo ] && echo -e "${CGREEN}WordOps Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/bin/fail2ban-client ] && echo -e "${CGREEN}Fail2ban Instalado${CEND}   [${CGREEN}OK${CEND}]"
-#which clamscan && echo -e "${CGREEN}clamav Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/local/bin/monit ] && echo -e "${CGREEN}Monit Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -d /opt/netdata ] && echo -e "${CGREEN}Netdata Instalado${CEND}   [${CGREEN}OK${CEND}]" 
-[ -f /usr/sbin/ufw ] && echo -e "${CGREEN}Firewall-UFW Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/bin/mysql ] && echo -e "${CGREEN}Mysql Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/sbin/nginx ] && echo -e "${CGREEN}Nginx Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -d /var/www/22222/htdocs/pma ] && echo -e "${CGREEN}PHPMyAdmin Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -d /var/www/22222/htdocs/adminer ] && echo -e "${CGREEN}Adminer Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -d /var/www/22222/htdocs/anemometer ] && echo -e "${CGREEN}Anemometer Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -d /var/www/22222/htdocs/files ] && echo -e "${CGREEN}Exploter Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/bin/php7.2 ] && echo -e "${CGREEN}PHP-7.2 Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/bin/php7.3 ] && echo -e "${CGREEN}PHP-7.3 Instalado${CEND}   [${CGREEN}OK${CEND}]"
-[ -f /usr/local/bin/wp ] && echo -e "${CGREEN}WP-CLI Instalado${CEND}   [${CGREEN}OK${CEND}]"
 echo -e "${CGREEN}Finalizando...${CEND}   [${CGREEN}OK${CEND}]"
 ###
 ADDRESS=$(hostname -I | awk '{ print $1}')
 echo " "
 echo " Optimized Wordops was setup successfully! "
 echo " Painel Principal: https://$ADDRESS:22222"
-echo " Painel Netdata: https://$ADDRESS:22222/netdata"
-echo " Painel Monit: https://$ADDRESS:22222/monit"
 echo " "
