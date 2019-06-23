@@ -1,11 +1,6 @@
-# WO Install
-Script para instalação do WordOps com o script wo-nginx-setup de Virtubox mais alguns utilitários para configurar seu servidor.
+# WO Install PAck
+Script para instalação do WordOps com o script wo-install-pack.sh mais alguns utilitários para configurar seu servidor.
 
-Script em construção:
-
-Itens que serão integrados ao script
-
-[github Issues](https://github.com/juanpvh/wo-install/issues/1)
 
 vamos la!
 
@@ -28,7 +23,7 @@ wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-mr-cli.sh &&
 ```
 
 ```
-wget https://raw.githubusercontent.com/juanpvh/wo-install/master/lets.sh && chmod +x lets && clear && ./lets.sh
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/lets.sh && chmod +x lets.sh && clear && ./lets.sh
 ```
 
 ```
