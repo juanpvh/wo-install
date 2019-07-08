@@ -445,7 +445,7 @@ echo -e "${CGREEN}
  
 
 #ATIVANDO FIREWALL
-ufw enable
+ufw enable -y
 ufw reload
 
 ###Limpando Instalação...

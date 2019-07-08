@@ -209,12 +209,19 @@ if [[ "$MIGRATION_ALL" == "yes" ]]; then
 		echo "🔥  $SITE Backup Complete!"
 		echo "——————————————————————————————————"
 		
-	   # FIXANDO PERMISSÕES.
-	   chown -R www-data:www-data $SITESTORE/$SITE/htdocs/
-	   find $SITESTORE/$SITE/htdocs/ -type f -exec chmod 644 {} +
-	   find $SITESTORE/$SITE/htdocs/ -type d -exec chmod 755 {} +
+	    # FIXANDO PERMISSÕES.
+	    chown -R www-data:www-data $SITESTORE/$SITE/htdocs/
+	    find $SITESTORE/$SITE/htdocs/ -type f -exec chmod 644 {} +
+	    find $SITESTORE/$SITE/htdocs/ -type d -exec chmod 755 {} +
 
 	done
+
+		# ENVIANDO OS BACKUPS COM RSYNC.
+		rsync -azh --progress $BACKUPPATH/ root@$IP_ANDRESS:$BACKUPPATH/
+	
+		echo "——————————————————————————————————"
+		echo "🔥  Backup Completo!"
+		echo "——————————————————————————————————"
 
 	# DELETA TODOS OS BACKUPS LOCAIS.
 	rm -rf $BACKUPPATH/*
