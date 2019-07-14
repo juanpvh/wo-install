@@ -200,7 +200,6 @@ echo -e "${CGREEN}
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
-        /usr/local/bin/wo stack install --phpredisadmin
 	    apt-get install php7.2-intl
        
     
@@ -301,19 +300,19 @@ echo -e "${CGREEN}
 ###
 
 ###Instalando Clamav...
-#
-#    if [ -f /usr/bin/clamscan ]; then
-#
-#        echo "Clamav instalado"
-#    else
-#
-#        apt-get install clamav clamav-daemon -y
-#        /etc/init.d/clamav-freshclam stop
-#        freshclam
-#        /etc/init.d/clamav-freshclam start
-#
-#    fi
-#
+
+    if [ -f /usr/bin/clamscan ]; then
+
+        echo "Clamav instalado"
+    else
+
+        apt-get install clamav clamav-daemon -y
+        /etc/init.d/clamav-freshclam stop
+        freshclam
+        /etc/init.d/clamav-freshclam start
+
+    fi
+
 ###
 
 ###Instalando Monit...
@@ -363,24 +362,24 @@ echo -e "${CGREEN}
 
 ### Install Rkhunter
 
-#    if [ -z "$(command -v rkhunter)" ]; then
-#	
-#	apt-get install rkhunter -y
-#
-#	sed -i 's/UPDATE_MIRRORS=0/UPDATE_MIRRORS=1/' /etc/rkhunter.conf
-#	sed -i 's/MIRRORS_MODE=1/UPDATE_MIRRORS=0/' /etc/rkhunter.conf
-#	sed -i 's/WEB_CMD="\/bin\/false"/WEB_CMD=""/' /etc/rkhunter.conf
-#
-#	sed -i 's/CRON_DAILY_RUN=""/CRON_DAILY_RUN="true"/' /etc/default/rkhunter
-#	sed -i 's/CRON_DB_UPDATE=""/CRON_DB_UPDATE="true"/' /etc/default/rkhunter
-#	sed -i 's/APT_AUTOGEN="false"/APT_AUTOGEN="true"/' /etc/default/rkhunter
-#	rkhunter -C
-#	rkhunter --update
-#	rkhunter --versioncheck
-#	rkhunter --propupd
-#	rkhunter --check --sk
-#	
-#    fi
+    if [ -z "$(command -v rkhunter)" ]; then
+	
+	apt-get install rkhunter -y
+
+	sed -i 's/UPDATE_MIRRORS=0/UPDATE_MIRRORS=1/' /etc/rkhunter.conf
+	sed -i 's/MIRRORS_MODE=1/UPDATE_MIRRORS=0/' /etc/rkhunter.conf
+	sed -i 's/WEB_CMD="\/bin\/false"/WEB_CMD=""/' /etc/rkhunter.conf
+
+	sed -i 's/CRON_DAILY_RUN=""/CRON_DAILY_RUN="true"/' /etc/default/rkhunter
+	sed -i 's/CRON_DB_UPDATE=""/CRON_DB_UPDATE="true"/' /etc/default/rkhunter
+	sed -i 's/APT_AUTOGEN="false"/APT_AUTOGEN="true"/' /etc/default/rkhunter
+	rkhunter -C
+	rkhunter --update
+	rkhunter --versioncheck
+	rkhunter --propupd
+	rkhunter --check --sk
+	
+    fi
 
 
 
