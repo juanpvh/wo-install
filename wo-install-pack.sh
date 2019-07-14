@@ -258,8 +258,6 @@ echo -e "${CGREEN}
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
-        bash <(wget -O - vtb.cx/nginx-ee || curl -sL vtb.cx/nginx-ee) --stable --naxsi
-
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
         cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
@@ -271,25 +269,6 @@ echo -e "${CGREEN}
 
     # optimized nginx.config
     cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
-
-    # commit changes
-    git -C /etc/nginx/ add /etc/nginx/ && git -C /etc/nginx/ commit -m "update conf.d configurations"
-
-
-    # reduce nginx logs rotation
-    sed -i 's/size 10M/weekly/' /etc/logrotate.d/nginx
-    sed -i 's/rotate 52/rotate 4/' /etc/logrotate.d/nginx
-
-
-    VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
-
-    if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-         service nginx reload
-    else
-
-        echo "Nginx configuration is not correct"
-
-    fi
 
     # Add fail2ban configurations
     cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
