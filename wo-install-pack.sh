@@ -96,46 +96,7 @@ echo -e "${CGREEN}
     
     git clone https://github.com/juanpvh/wo-install.git $HOME/wo-install || git -C $HOME/wo-install pull origin master
         
-
-
 ###
-
-###Instalando firewall - ufw
-
-    apt-get install ufw -y
- 
-    ###Difinindo regras do firewall - ufw
-
-    ufw logging low
-    ufw default allow outgoing
-    ufw default deny incoming
-    ufw allow 22
-    # dns
-    ufw allow 53
-    # nginx
-    ufw allow http
-    ufw allow https
-    # ntp
-    ufw allow 123
-    # dhcp client
-    ufw allow 68
-    # dhcp ipv6 client
-    ufw allow 546
-    # rsync
-    ufw allow 873
-    # easyengine backend
-    ufw allow 22222
-    # Netdata web interface
-    ufw allow 19999
-    # Monit web interface
-    ufw allow 2812
-    # ftp active port
-    ufw allow 21
-    # ftp passive ports
-    ufw allow 49000:50000/tcp
-
-###
-
 
 ### Redis transparent_hugepage
 
@@ -145,36 +106,36 @@ echo -e "${CGREEN}
 
 ### disable ip forwarding if docker is not installed
 
-    if [ ! -x /usr/bin/docker ]; then
-
-        echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
-        {
-            echo "# Disables packet forwarding"
-            echo "net.ipv4.ip_forward = 0"
-            echo "net.ipv4.conf.all.forwarding = 0"
-            echo "net.ipv4.conf.default.forwarding = 0"
-            echo "net.ipv6.conf.all.forwarding = 0"
-            echo "net.ipv6.conf.default.forwarding = 0"
-        } >>/etc/sysctl.d/60-wo-tweaks.conf
-
-    fi
-
-    # additional systcl configuration with network interface name
-    # get network interface names like eth0, ens18 or eno1
-    # for each interface found, add the following configuration to sysctl
-
-    NET_INTERFACES_WAN=$(ip -4 route get 8.8.8.8 | grep -oP "dev [^[:space:]]+ " | cut -d ' ' -f 2)
-    echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
-    {
-        echo "# do not autoconfigure IPv6 on $NET_INTERFACES_WAN"
-        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
-        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
-        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
-        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
-        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
-    } >>/etc/sysctl.d/60-wo-tweaks.conf
-
-    sysctl -e -p /etc/sysctl.d/60-wo-tweaks.conf
+#    if [ ! -x /usr/bin/docker ]; then
+#
+#        echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
+#        {
+#            echo "# Disables packet forwarding"
+#            echo "net.ipv4.ip_forward = 0"
+#            echo "net.ipv4.conf.all.forwarding = 0"
+#            echo "net.ipv4.conf.default.forwarding = 0"
+#            echo "net.ipv6.conf.all.forwarding = 0"
+#            echo "net.ipv6.conf.default.forwarding = 0"
+#        } >>/etc/sysctl.d/60-wo-tweaks.conf
+#
+#    fi
+#
+#    # additional systcl configuration with network interface name
+#    # get network interface names like eth0, ens18 or eno1
+#    # for each interface found, add the following configuration to sysctl
+#
+#    NET_INTERFACES_WAN=$(ip -4 route get 8.8.8.8 | grep -oP "dev [^[:space:]]+ " | cut -d ' ' -f 2)
+#    echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
+#    {
+#        echo "# do not autoconfigure IPv6 on $NET_INTERFACES_WAN"
+#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
+#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
+#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
+#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
+#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
+#    } >>/etc/sysctl.d/60-wo-tweaks.conf
+#
+#    sysctl -e -p /etc/sysctl.d/60-wo-tweaks.conf
 
 ###
 
@@ -206,24 +167,24 @@ echo -e "${CGREEN}
     fi
 ###
 
-###Otimizando a configuração do mariadb
-    if [ -e /usr/bin/mysql ]; then
-
-        cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
-        # stop mysql service to apply new InnoDB log file size
-        service mysql stop
-        # mv previous log file
-        mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
-        mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
-        # increase mariadb open_files_limit
-        cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
-        # reload daemon
-        systemctl daemon-reload
-        # restart mysql
-        service mysql start
-        
-    fi
-###
+####Otimizando a configuração do mariadb
+#    if [ -e /usr/bin/mysql ]; then
+#
+#        cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
+#        # stop mysql service to apply new InnoDB log file size
+#        service mysql stop
+#        # mv previous log file
+#        mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
+#        mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
+#        # increase mariadb open_files_limit
+#        cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
+#        # reload daemon
+#        systemctl daemon-reload
+#        # restart mysql
+#        service mysql start
+#        
+#    fi
+####
 
 ###Configurando adicionais acesso www-data shell
 
@@ -261,7 +222,7 @@ echo -e "${CGREEN}
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
         cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
-        cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
+        #cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
     fi
 ###
 
@@ -372,48 +333,39 @@ echo -e "${CGREEN}
 
 ###
 
-###Instalando ProFTPd...
 
-    if [ -f /usr/sbin/proftpd ]; then
+###Difinindo regras do firewall - ufw
 
-        echo "ProFTPd Instalado"
-
-    else
-
-        apt-get install proftpd -y
-
-        # secure proftpd and enable PassivePorts
-
-        sed -i 's/# DefaultRoot/DefaultRoot/' /etc/proftpd/proftpd.conf
-        sed -i 's/# RequireValidShell/RequireValidShell/' /etc/proftpd/proftpd.conf
-        sed -i 's/# PassivePorts                  49152 65534/PassivePorts                  49000 50000/' /etc/ proftpd/proftpd.conf
-
-         service proftpd restart
-
-        if [ -d /etc/ufw ]; then
-            # ftp active port
-             ufw allow 21
-            # ftp passive ports
-             ufw allow 49000:50000/tcp
-        fi
-
-        if [ -d /etc/fail2ban ]; then
-            echo -e '\n[proftpd]\nenabled = true\n' >> /etc/fail2ban/jail.d/custom.conf
-            fail2ban-client reload
-
-        fi
-    fi
-
-###
-
-
-####Instalando Postfix
-
-#debconf-set-selections <<< "postfix postfix/mailname string localhost"
-#debconf-set-selections <<< "postfix postfix/main_mailer_type string 'smarthost'"
-#apt-get install -y postfix
+    ufw logging low
+    ufw default allow outgoing
+    ufw default deny incoming
+    ufw allow 22
+    # dns
+    ufw allow 53
+    # nginx
+    ufw allow http
+    ufw allow https
+    # ntp
+    ufw allow 123
+    # dhcp client
+    ufw allow 68
+    # dhcp ipv6 client
+    ufw allow 546
+    # rsync
+    ufw allow 873
+    # easyengine backend
+    ufw allow 22222
+    # Netdata web interface
+    ufw allow 19999
+    # Monit web interface
+    ufw allow 2812
+    # ftp active port
+    ufw allow 21
+    # ftp passive ports
+    ufw allow 49000:50000/tcp
 
 ###
+
 
 ###Instalando Script de otimização de imagens...
 
