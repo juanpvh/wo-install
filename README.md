@@ -34,5 +34,6 @@ wget https://raw.githubusercontent.com/juanpvh/wo-install/master/installplugin.s
 wget https://raw.githubusercontent.com/juanpvh/wo-install/master/dellplugin.sh && chmod +x dellplugin.sh && clear && ./dellplugin.sh
 ```
 
-
-
+```
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-up.sh && chmod +x wo-up.sh && clear && ./wo-up.sh
+```
