@@ -221,7 +221,7 @@ echo -e "${CGREEN}
     
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
-        cp -f $HOME/wo-install/etc/php/7.2/fpm/php.ini /etc/php/7.2/fpm/php.ini
+        sed -i "s/memory_limit = 128M/memory_limit = 256M/" /etc/php/7.2/fpm/php.ini
         #cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
     fi
 ###
@@ -229,7 +229,7 @@ echo -e "${CGREEN}
 ###Configuração adicional nginx, logrotate, fail2ban...
 
     # optimized nginx.config
-    cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+    #cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
     # Add fail2ban configurations
     cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
@@ -287,9 +287,9 @@ echo -e "${CGREEN}
         #linkar
         ln -s /etc/monit/monit.d/* /etc/monit/conf-enable/
 
-        mysql -e "create user 'monit'@'localhost' IDENTIFIED BY 'mysecretpassword';" > /dev/null 2>&1
+        mysql -e "CREATE USER 'monit'@'localhost' IDENTIFIED BY 'mysecretpassword';" > /dev/null 2>&1
         mysql -e "FLUSH PRIVILEGES"
-
+        systemctl restart mysql
         monit
         monit reload
 
@@ -375,7 +375,7 @@ echo -e "${CGREEN}
  
 
 #ATIVANDO FIREWALL
-ufw enable -y
+ufw enable
 ufw reload
 
 ###Limpando Instalação...
