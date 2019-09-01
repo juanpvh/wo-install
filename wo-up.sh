@@ -121,3 +121,7 @@ if [[ "$BACKUP_ALL" == "yes" ]]; then
 
 fi
 
+
+
+wp db repair --path=/var/www/painelmt.servicodigital.info/htdocs/ --allow-root
+wp db optimize --path=/var/www/painelmt.servicodigital.info/htdocs/ --allow-root

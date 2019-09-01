@@ -75,7 +75,7 @@ echo -e "${CGREEN}
 
 ###Instalação de Serviços Adicionais
 
-    apt-get install haveged jpegoptim optipng webp curl mutt git zip unzip fail2ban htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen -y
+    apt-get install haveged jpegoptim optipng webp curl mutt git zip unzip htop nload jq nmon tar gzip ntp ntpdate gnupg gnupg2 wget pigz tree ccze mycli screen -y
     ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
     dpkg-reconfigure --frontend noninteractive tzdata
 ###
@@ -161,6 +161,7 @@ echo -e "${CGREEN}
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
+        /usr/local/bin/wo stack install --clamav
 	    apt-get install php7.2-intl
        
     
@@ -239,21 +240,21 @@ echo -e "${CGREEN}
 
 ###
 
-###Instalando Clamav...
-
-    if [ -f /usr/bin/clamscan ]; then
-
-        echo "Clamav instalado"
-    else
-
-        apt-get install clamav clamav-daemon -y
-        /etc/init.d/clamav-freshclam stop
-        freshclam
-        /etc/init.d/clamav-freshclam start
-
-    fi
-
-###
+####Instalando Clamav...
+#
+#    if [ -f /usr/bin/clamscan ]; then
+#
+#        echo "Clamav instalado"
+#    else
+#
+#        apt-get install clamav clamav-daemon -y
+#        /etc/init.d/clamav-freshclam stop
+#        freshclam
+#        /etc/init.d/clamav-freshclam start
+#
+#    fi
+#
+####
 
 ###Instalando Monit...
     if [ -f /usr/local/bin/monit ]; then
@@ -339,30 +340,30 @@ echo -e "${CGREEN}
     ufw logging low
     ufw default allow outgoing
     ufw default deny incoming
-    ufw allow 22
+    #ufw allow 22
     # dns
-    ufw allow 53
+    #ufw allow 53
     # nginx
-    ufw allow http
-    ufw allow https
+    #ufw allow http
+    #ufw allow https
     # ntp
-    ufw allow 123
+    #ufw allow 123
     # dhcp client
-    ufw allow 68
+    #ufw allow 68
     # dhcp ipv6 client
-    ufw allow 546
+    #ufw allow 546
     # rsync
     ufw allow 873
     # easyengine backend
-    ufw allow 22222
+    #ufw allow 22222
     # Netdata web interface
-    ufw allow 19999
+    #ufw allow 19999
     # Monit web interface
-    ufw allow 2812
+    #ufw allow 2812
     # ftp active port
-    ufw allow 21
+    #ufw allow 21
     # ftp passive ports
-    ufw allow 49000:50000/tcp
+    #ufw allow 49000:50000/tcp
 
 ###
 
@@ -375,7 +376,6 @@ echo -e "${CGREEN}
  
 
 #ATIVANDO FIREWALL
-ufw enable
 ufw reload
 
 ###Limpando Instalação...
