@@ -5,6 +5,7 @@ VERDE='\e[0;32m'
 NC='\e[0m' 
 
 SITELIST=$(ls -1L /var/www -I22222 -Ihtml)
+
  
 #Loop para instalar o plugin em todos os diretorios encontrados
 for dominio in ${SITELIST[@]}; do
@@ -13,10 +14,15 @@ for dominio in ${SITELIST[@]}; do
  
   if [[ $? = 0 ]] && [[ -d "/var/www/$dominio" ]]; then
 
+  if [ -z /usr/local/bin ]; then
+  	
+	wo site update $dominio --le=renew
 
-	
-	wo site update $dominio --wpfc
-  wo site update $dominio --le
+  else
+
+  wo site update $dominio --le=renew
+  
+  fi
 	
   fi
 
