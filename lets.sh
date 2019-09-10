@@ -28,3 +28,4 @@ for dominio in ${SITELIST[@]}; do
 
 done
 
+rm -rm $HOME/lets.sh
