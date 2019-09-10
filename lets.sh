@@ -14,13 +14,13 @@ for dominio in ${SITELIST[@]}; do
  
   if [[ $? = 0 ]] && [[ -d "/var/www/$dominio" ]]; then
 
-  if [ -z /usr/local/bin ]; then
+  if [ -z /usr/local/bin/wo ]; then
   	
 	wo site update $dominio --le=renew
 
   else
 
-  wo site update $dominio --le=renew
+  ee site update $dominio --le=renew
   
   fi
 	
@@ -28,4 +28,4 @@ for dominio in ${SITELIST[@]}; do
 
 done
 
-rm -rm $HOME/lets.sh
+rm -rf /$HOME/lets.sh
