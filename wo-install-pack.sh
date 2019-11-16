@@ -131,7 +131,7 @@ echo "INSTALANDO WO-CLI.."
     else
 
         wget -qO wo wops.cc && sudo bash wo
-        source /etc/bash_completion.d/wo_auto.rc
+        bash -l
         rm -rf wo
     
     fi
@@ -308,6 +308,9 @@ cp $HOME/.img-optimize/crons/jpg-png-cron.sh /etc/cron.weekly/webp-cron
 chmod + x /etc/cron.weekly/jpg-png-cron
 chmod + x /etc/cron.weekly/webp-cron
 
+###Configurando chave keys
+
+cp $HOME/.etc/sshd_config /etc/ssh/sshd_config
  
 
 #ATIVANDO FIREWALL

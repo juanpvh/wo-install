@@ -8,9 +8,9 @@ check process php7.2-fpm with pidfile /run/php/php7.2-fpm.pid
     if 5 restarts within 5 cycles then timeout
 
 #REGRA PARA PHP7.3	
-check process php7.3-fpm with pidfile /run/php/php7.2-fpm.pid
-    start program = "/etc/init.d/php7.2-fpm start"
-    stop program  = "/etc/init.d/php7.2-fpm stop"
+check process php7.3-fpm with pidfile /run/php/php7.3-fpm.pid
+    start program = "/etc/init.d/php7.3-fpm start"
+    stop program  = "/etc/init.d/php7.3-fpm stop"
     if failed port 9173 type TCP then restart
 	if cpu > 90% for 5 cycles then restart
     if 5 restarts within 5 cycles then timeout	
