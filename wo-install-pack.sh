@@ -49,7 +49,7 @@ echo -e "${CGREEN}
  -------------------------------------------------------------------------
  Github:        https://github.com/juanpvh/wo-install
  Script:        WO-INSTALL
- Version 1.0 - 04/2019
+ Atualização:   16-11-2019
  -------------------------------------------------------------------------
  ${CEND}"
  sleep 5
@@ -59,8 +59,11 @@ echo -e "${CGREEN}
 ##################################
 
 #adicionar swap
-
-    fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile; free -m
+    dd if=/dev/zero of=/var/swap bs=1k count=1024k
+    mkswap /var/swap
+    swapon /var/swap
+    echo '/var/swap swap swap defaults 0 0' | sudo tee -a /etc/fstab
+    free -m
 ###
 
 ###Pacotes do Sistemas Atualizados
@@ -104,39 +107,18 @@ echo -e "${CGREEN}
 
 ###
 
-### disable ip forwarding if docker is not installed
+### Instalando Rclone e wo-cli
+echo "INSTALANDO RCLONE..."
+    [ -e /usr/bin/rclone ] && echo "Rclone Existe ⚡️" || curl https://rclone.org/install.sh | sudo bash
 
-#    if [ ! -x /usr/bin/docker ]; then
-#
-#        echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
-#        {
-#            echo "# Disables packet forwarding"
-#            echo "net.ipv4.ip_forward = 0"
-#            echo "net.ipv4.conf.all.forwarding = 0"
-#            echo "net.ipv4.conf.default.forwarding = 0"
-#            echo "net.ipv6.conf.all.forwarding = 0"
-#            echo "net.ipv6.conf.default.forwarding = 0"
-#        } >>/etc/sysctl.d/60-wo-tweaks.conf
-#
-#    fi
-#
-#    # additional systcl configuration with network interface name
-#    # get network interface names like eth0, ens18 or eno1
-#    # for each interface found, add the following configuration to sysctl
-#
-#    NET_INTERFACES_WAN=$(ip -4 route get 8.8.8.8 | grep -oP "dev [^[:space:]]+ " | cut -d ' ' -f 2)
-#    echo "" >>/etc/sysctl.d/60-wo-tweaks.conf
-#    {
-#        echo "# do not autoconfigure IPv6 on $NET_INTERFACES_WAN"
-#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
-#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
-#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra = 0"
-#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.autoconf = 0"
-#        echo "net.ipv6.conf.$NET_INTERFACES_WAN.accept_ra_defrtr = 0"
-#    } >>/etc/sysctl.d/60-wo-tweaks.conf
-#
-#    sysctl -e -p /etc/sysctl.d/60-wo-tweaks.conf
+echo "INSTALANDO WO-CLI.."
+    [ -e /usr/local/bin/wo-cli ] && echo "wo-cli Existe ⚡️" || wget -O /usr/local/bin/wo-cli https://raw.githubusercontent.com/juanpvh/wo-cli/master/wo-cli.sh
+ chmod +x /usr/local/bin/wo-cli
 
+echo -ne "Digite o Nome da Pasta Onde ficara os BackUps: " ; read DIR 
+sed -i "s/BACKUPS=BK/BACKUPS=$DIR/" /usr/local/bin/wo-cli
+
+(crontab -l; echo "0 2 * * * bash /usr/local/bin/wo-cli -b >> /var/log/wo-cli.log 2>&1") | crontab -
 ###
 
 ################################################
@@ -167,25 +149,6 @@ echo -e "${CGREEN}
     
     fi
 ###
-
-####Otimizando a configuração do mariadb
-#    if [ -e /usr/bin/mysql ]; then
-#
-#        cp -f $HOME/wo-install/etc/mysql/my.cnf /etc/mysql/my.cnf
-#        # stop mysql service to apply new InnoDB log file size
-#        service mysql stop
-#        # mv previous log file
-#        mv /var/lib/mysql/ib_logfile0 /var/lib/mysql/ib_logfile0.bak
-#        mv /var/lib/mysql/ib_logfile1 /var/lib/mysql/ib_logfile1.bak
-#        # increase mariadb open_files_limit
-#        cp -f $HOME/wo-install/etc/systemd/system/mariadb.service.d/limits.conf /etc/systemd/system/mariadb.service.d/limits.conf
-#        # reload daemon
-#        systemctl daemon-reload
-#        # restart mysql
-#        service mysql start
-#        
-#    fi
-####
 
 ###Configurando adicionais acesso www-data shell
 
@@ -222,42 +185,21 @@ echo -e "${CGREEN}
     
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
-        sed -i "s/memory_limit = 128M/memory_limit = 256M/" /etc/php/7.2/fpm/php.ini
+        #sed -i "s/memory_limit = 128M/memory_limit = 256M/" /etc/php/7.2/fpm/php.ini
         #cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
     fi
 ###
 
-###Configuração adicional nginx, logrotate, fail2ban...
+###Configuração adicional  fail2ban...
 
-    # optimized nginx.config
-    #cp -f $HOME/wo-install/etc/nginx/nginx.conf /etc/nginx/nginx.conf
-
-    # Add fail2ban configurations
+   # Add fail2ban configurations
     cp -rf $HOME/wo-install/etc/fail2ban/filter.d/* /etc/fail2ban/filter.d/
     cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
 
     fail2ban-client reload
 
-###
-
-####Instalando Clamav...
-#
-#    if [ -f /usr/bin/clamscan ]; then
-#
-#        echo "Clamav instalado"
-#    else
-#
-#        apt-get install clamav clamav-daemon -y
-#        /etc/init.d/clamav-freshclam stop
-#        freshclam
-#        /etc/init.d/clamav-freshclam start
-#
-#    fi
-#
-####
-
 ###Instalando Monit...
-    if [ -f /usr/local/bin/monit ]; then
+if [ -f /usr/local/bin/monit ]; then
 
         echo "Monit Instalando"
 
@@ -288,22 +230,22 @@ echo -e "${CGREEN}
         #linkar
         ln -s /etc/monit/monit.d/* /etc/monit/conf-enable/
 
-        mysql -e "CREATE USER 'monit'@'localhost' IDENTIFIED BY 'mysecretpassword';" > /dev/null 2>&1
-        mysql -e "FLUSH PRIVILEGES"
-        systemctl restart mysql
+        #mysql -e "CREATE USER 'monit'@'localhost' IDENTIFIED BY 'mysecretpassword';" > /dev/null 2>&1
+        #mysql -e "FLUSH PRIVILEGES"
+        #systemctl restart mysql
         monit
         monit reload
 
         
 
-    fi
+fi
 	
 ###
 
 
 ### Install Rkhunter
 
-    if [ -z "$(command -v rkhunter)" ]; then
+if [ -z "$(command -v rkhunter)" ]; then
 	
 	apt-get install rkhunter -y
 
@@ -320,7 +262,7 @@ echo -e "${CGREEN}
 	rkhunter --propupd
 	rkhunter --check --sk
 	
-    fi
+fi
 
 
 
@@ -337,54 +279,49 @@ echo -e "${CGREEN}
 
 ###Difinindo regras do firewall - ufw
 
-    ufw logging low
-    ufw default allow outgoing
-    ufw default deny incoming
-    #ufw allow 22
-    # dns
-    #ufw allow 53
-    # nginx
-    #ufw allow http
-    #ufw allow https
-    # ntp
-    #ufw allow 123
-    # dhcp client
-    #ufw allow 68
-    # dhcp ipv6 client
-    #ufw allow 546
-    # rsync
-    ufw allow 873
-    # easyengine backend
-    #ufw allow 22222
-    # Netdata web interface
-    #ufw allow 19999
-    # Monit web interface
-    #ufw allow 2812
-    # ftp active port
-    #ufw allow 21
-    # ftp passive ports
-    #ufw allow 49000:50000/tcp
+ufw logging low
+ufw default allow outgoing
+ufw default deny incoming
+ufw allow 4444
+ufw allow 53
+ufw allow http
+ufw allow https
+ufw allow 123
+ufw allow 68
+ufw allow 546
+ufw allow 873
+ufw allow 22222
+ufw allow 19999
+ufw allow 2812
+ufw allow 49000:50000/tcp
 
 ###
 
 
 ###Instalando Script de otimização de imagens...
 
-    cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
-    chmod +x /etc/cron.weekly/jpg-png-cron
+cp $HOME/.img-optimize/optimize.sh /usr/local/bin/img-optimize
+chmod +x chmod +x /usr/local/bin/img-optimize
+
+cp $HOME/.img-optimize/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
+cp $HOME/.img-optimize/crons/jpg-png-cron.sh /etc/cron.weekly/webp-cron
+
+chmod + x /etc/cron.weekly/jpg-png-cron
+chmod + x /etc/cron.weekly/webp-cron
 
  
 
 #ATIVANDO FIREWALL
 ufw reload
+echo "y" | ufw enable
 
 ###Limpando Instalação...
 
-        apt-get -y autoremove php5.6-fpm php5.6-common --purge
-        apt-get -y autoremove php7.0-fpm php7.0-common --purge
-        apt-get -y autoremove php7.1-fpm php7.1-common --purge
-        cd ~
-        rm -rf wo-install nginx-build.sh wo-install-pack.sh
+apt-get -y autoremove php5.6-fpm php5.6-common --purge
+apt-get -y autoremove php7.0-fpm php7.0-common --purge
+apt-get -y autoremove php7.1-fpm php7.1-common --purge
+cd ~
+rm -rf wo-install nginx-build.sh wo-install-pack.sh
 
 ###
 clear
@@ -396,4 +333,4 @@ ADDRESS=$(hostname -I | awk '{ print $1}')
 echo " "
 echo " Optimized Wordops was setup successfully! "
 echo " Painel Principal: https://$ADDRESS:22222"
-echo " "
+echo " Para Configurar o Rclone digite: rclone config"

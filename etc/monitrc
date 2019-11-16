@@ -1,6 +1,6 @@
 #Configuração global do monit
 set daemon  60
-set log syslog
+set log /var/log/monit.log
 set idfile /var/.monit.id
 set statefile /var/.monit.state
 

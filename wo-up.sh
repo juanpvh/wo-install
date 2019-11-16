@@ -120,8 +120,3 @@ if [[ "$BACKUP_ALL" == "yes" ]]; then
 	# DELETA TODOS OS BACKUPS LOCAIS.
 
 fi
-
-
-
-wp db repair --path=/var/www/painelmt.servicodigital.info/htdocs/ --allow-root
-wp db optimize --path=/var/www/painelmt.servicodigital.info/htdocs/ --allow-root
