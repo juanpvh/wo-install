@@ -281,7 +281,7 @@ fi
 ufw logging low
 ufw default allow outgoing
 ufw default deny incoming
-ufw allow 4444
+ufw allow 22
 ufw allow 53
 ufw allow http
 ufw allow https
@@ -299,20 +299,16 @@ ufw allow 49000:50000/tcp
 
 ###Instalando Script de otimização de imagens...
 
-cp $HOME/.img-optimize/optimize.sh /usr/local/bin/img-optimize
+cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
 chmod +x chmod +x /usr/local/bin/img-optimize
 
-cp $HOME/.img-optimize/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
-cp $HOME/.img-optimize/crons/jpg-png-cron.sh /etc/cron.weekly/webp-cron
+cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
+cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/webp-cron
 
 chmod + x /etc/cron.weekly/jpg-png-cron
 chmod + x /etc/cron.weekly/webp-cron
 
-###Configurando chave keys
 
-cp $HOME/.etc/sshd_config /etc/ssh/sshd_config
-systemctl restart ssh
- 
 
 #ATIVANDO FIREWALL
 ufw reload
@@ -328,7 +324,6 @@ rm -rf wo-install nginx-build.sh wo-install-pack.sh
 
 ###
 
-bash -l
 clear
 
 [ -f /usr/local/bin/wo ] && echo -e "${CGREEN}WordOps Instalado${CEND}   [${CGREEN}OK${CEND}]"
@@ -339,3 +334,5 @@ echo " "
 echo " Optimized Wordops was setup successfully! "
 echo " Painel Principal: https://$ADDRESS:22222"
 echo " Para Configurar o Rclone digite: rclone config"
+
+
