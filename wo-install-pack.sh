@@ -115,8 +115,7 @@ echo "INSTALANDO WO-CLI.."
     [ -e /usr/local/bin/wo-cli ] && echo "wo-cli Existe ⚡️" || wget -O /usr/local/bin/wo-cli https://raw.githubusercontent.com/juanpvh/wo-cli/master/wo-cli.sh
  chmod +x /usr/local/bin/wo-cli
 
-echo -ne "Digite o Nome da Pasta Onde ficara os BackUps: " ; read DIR 
-sed -i "s/BACKUPS=BK/BACKUPS=$DIR/" /usr/local/bin/wo-cli
+#sed -i "s/BACKUPS=BK/BACKUPS=$USER/" /usr/local/bin/wo-cli
 
 (crontab -l; echo "0 2 * * * bash /usr/local/bin/wo-cli -b >> /var/log/wo-cli.log 2>&1") | crontab -
 ###
