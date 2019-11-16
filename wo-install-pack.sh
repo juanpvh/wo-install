@@ -131,7 +131,7 @@ echo "INSTALANDO WO-CLI.."
     else
 
         wget -qO wo wops.cc && sudo bash wo
-        bash -l
+        source /etc/bash_completion.d/wo_auto.rc
         rm -rf wo
     
     fi
@@ -326,6 +326,8 @@ cd ~
 rm -rf wo-install nginx-build.sh wo-install-pack.sh
 
 ###
+
+bash -l
 clear
 
 [ -f /usr/local/bin/wo ] && echo -e "${CGREEN}WordOps Instalado${CEND}   [${CGREEN}OK${CEND}]"
