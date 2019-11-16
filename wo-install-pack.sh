@@ -311,6 +311,7 @@ chmod + x /etc/cron.weekly/webp-cron
 ###Configurando chave keys
 
 cp $HOME/.etc/sshd_config /etc/ssh/sshd_config
+systemctl restart ssh
  
 
 #ATIVANDO FIREWALL
