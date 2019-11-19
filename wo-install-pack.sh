@@ -52,7 +52,7 @@ echo -e "${CGREEN}
  Atualização:   16-11-2019
  -------------------------------------------------------------------------
  ${CEND}"
- sleep 5
+ sleep 3
  clear 
 ##################################
 # INSTALAÇÃO
@@ -206,7 +206,7 @@ if [ -f /usr/local/bin/monit ]; then
 
         apt-get -y autoremove monit --purge
         rm -rf /etc/monit/
-        apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev     autoconf bison libpam0g-dev
+        apt-get install -y git build-essential libtool openssl automake byacc flex zlib1g-dev libssl-dev autoconf bison libpam0g-dev
         cd ~
         wget https://mmonit.com/monit/dist/monit-5.25.2.tar.gz
         tar zxvf monit-*.tar.gz
