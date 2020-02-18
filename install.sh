@@ -145,6 +145,7 @@ echo "INSTALANDO WO-CLI.."
         /usr/local/bin/wo stack install --clamav 
         /usr/local/bin/wo stack install --ngxblocker
         /usr/local/bin/wo stack install --sendmail
+        /usr/local/bin/wo stack install --php73
 	    
        
     
