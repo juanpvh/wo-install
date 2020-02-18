@@ -142,8 +142,10 @@ echo "INSTALANDO WO-CLI.."
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
-        /usr/local/bin/wo stack install --clamav
-	    apt-get install php7.2-intl
+        /usr/local/bin/wo stack install --clamav 
+        /usr/local/bin/wo stack install --ngxblocker
+        /usr/local/bin/wo stack install --sendmail
+	    
        
     
     fi
@@ -275,13 +277,20 @@ fi
 
 ###
 
+# download secure sshd_config
+sudo cp -f $HOME/wo-install/etc/sshd_config /etc/ssh/sshd_config
+
+# restart ssh service
+sudo service ssh restart
 
 ###Difinindo regras do firewall - ufw
 
 ufw logging low
 ufw default allow outgoing
 ufw default deny incoming
-ufw allow 22
+#ssh
+ufw allow 4444
+ufw allow 25
 ufw allow 53
 ufw allow http
 ufw allow https
@@ -290,25 +299,11 @@ ufw allow 68
 ufw allow 546
 ufw allow 873
 ufw allow 22222
-ufw allow 19999
-ufw allow 2812
+ufw allow 1137
+#ufw allow 2812
 ufw allow 49000:50000/tcp
 
 ###
-
-
-###Instalando Script de otimização de imagens...
-
-cp $HOME/wo-install/img-optimize-master/optimize.sh /usr/local/bin/img-optimize
-chmod +x chmod +x /usr/local/bin/img-optimize
-
-cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/jpg-png-cron
-cp $HOME/wo-install/img-optimize-master/crons/jpg-png-cron.sh /etc/cron.weekly/webp-cron
-
-chmod + x /etc/cron.weekly/jpg-png-cron
-chmod + x /etc/cron.weekly/webp-cron
-
-
 
 #ATIVANDO FIREWALL
 ufw reload

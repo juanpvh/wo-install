@@ -17,8 +17,10 @@ script:
   - lsb_release -a
   - sudo echo "Travis Banch = $TRAVIS_BRANCH"
   - sudo bash wo-install-pack.sh --travis $TRAVIS_BRANCH || sudo tail -n 100 /var/log/wo/wordops.log
-  - sudo wo site create wordops.org --wp || sudo tail -n 100 /var/log/wo/wordops.log
-  - sudo wo site create wordops.io --mysql || sudo tail -n 100 /var/log/wo/wordops.log
+  - sudo wo site create site.tld --wpredis || sudo tail -n 100 /var/log/wo/wordops.log
+  - sudo wo site create wo.site.tld --wpfc || sudo tail -n 100 /var/log/wo/wordops.log
+  - sudo wo site create ee.site.tld --wp || sudo tail -n 100 /var/log/wo/wordops.log
+  - sudo wo site create bk.site.tld --mysql || sudo tail -n 100 /var/log/wo/wordops.log
   - sudo nginx -t
   - sudo chown -R travis /usr/local/src
   - sudo chmod 755 /usr/local/src

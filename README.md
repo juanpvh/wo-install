@@ -13,7 +13,7 @@ bash -c 'echo -e "[user]\n\tname = $USER\n\temail = $USER@$HOSTNAME" > $HOME/.gi
 ### Instalando:
 
 ```
-wget https://raw.githubusercontent.com/juanpvh/wo-install/master/wo-install-pack.sh && chmod +x wo-install-pack.sh && clear && ./wo-install-pack.sh
+wget https://raw.githubusercontent.com/juanpvh/wo-install/master/install.sh && chmod +x install.sh && clear && ./install.sh
 ```
 
 ### Outros:
