@@ -10,9 +10,9 @@ for dominio in ${DIR[@]}; do
  	
 	cd /var/www/$dominio/htdocs/wp-content/plugins/
 	wp plugin install mainwp-child --activate --allow-root --path=/var/www/
-chown -R www-data:www-data /var/www/
-find /var/www/ -type f -exec chmod 644 {} +
-find /var/www/ -type d -exec chmod 755 {} +
+chown -R www-data:www-data /var/www/$dominio
+find /var/www/$dominio -type f -exec chmod 644 {} +
+find /var/www/$dominio -type d -exec chmod 755 {} +
 	echo -e "${VERDE}Plugin Instalado em ${dominio} ${NC}"
 	 
 done

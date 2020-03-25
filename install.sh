@@ -142,11 +142,7 @@ echo "INSTALANDO WO-CLI.."
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
-        /usr/local/bin/wo stack install --clamav 
-        /usr/local/bin/wo stack install --ngxblocker
-        /usr/local/bin/wo stack install --sendmail
-        /usr/local/bin/wo stack install --php73
-	    
+        /usr/local/bin/wo stack install --ngxblocker   
        
     
     fi
@@ -298,6 +294,7 @@ ufw allow https
 ufw allow 123
 ufw allow 68
 ufw allow 546
+ufw allow 587
 ufw allow 873
 ufw allow 22222
 ufw allow 1137
