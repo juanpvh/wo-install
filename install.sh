@@ -142,7 +142,9 @@ echo "INSTALANDO WO-CLI.."
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
-        /usr/local/bin/wo stack install --ngxblocker   
+        /usr/local/bin/wo stack install --ngxblocker
+        /usr/local/bin/wo stack upgrade --phpmyadmin
+        
        
     
     fi
