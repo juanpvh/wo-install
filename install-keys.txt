@@ -1,7 +1,0 @@
-mkdir -p $HOME/.ssh
-echo "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGCmzAToZa+cJdyBDirc2mZi3xz68Y/XxmXRL9bceE4PK2rAz3GejSrpawQyPiAbudAmLhwXMVjJUUDmbmAhsKg=" >> $HOME/.ssh/authorized_keys
-echo "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNkRRu2MNhToKvW5wQd8zlfdiXJ6FDVVe9sSbKHYtWiSSMlV+TxfVYGrPzh/5lgcqS2iE4l9XGsDFIGV1XEwGgc= JuiceSSH" >> $HOME/.ssh/authorized_keys
-
-
-echo "TOKEN=816633013:AAGH-hS0rGnMMDNqKUYZ9uE_jUs2FCxHT0Y 
-CHATID=422343969" > /etc/telegramrc
