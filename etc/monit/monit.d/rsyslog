@@ -1,4 +1,4 @@
- check process rsyslogd with pidfile /var/run/rsyslogd.pid
+ check process RSYSLOGD with pidfile /var/run/rsyslogd.pid
    group system
    group rsyslogd
    start program = "/etc/init.d/rsyslog start"

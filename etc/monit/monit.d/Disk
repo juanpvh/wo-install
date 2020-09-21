@@ -1,3 +1,3 @@
 #disco
-check device system with path /
-    if SPACE usage > 90% then alert
+  check filesystem disk with path /
+      if SPACE usage > 90% then exec "/usr/local/bin/monit2telegram"

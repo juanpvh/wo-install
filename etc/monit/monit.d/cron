@@ -1,4 +1,4 @@
- check process crond with pidfile /var/run/crond.pid
+ check process CROND with pidfile /var/run/crond.pid
    group system
    group crond
    start program = "/etc/init.d/cron start"

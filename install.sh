@@ -59,7 +59,7 @@ echo -e "${CGREEN}
 ##################################
 
 #adicionar swap
-    dd if=/dev/zero of=/var/swap bs=1k count=1024k
+    dd if=/dev/zero of=/var/swap bs=1k count=2048k
     mkswap /var/swap
     swapon /var/swap
     echo '/var/swap swap swap defaults 0 0' | sudo tee -a /etc/fstab
@@ -142,7 +142,6 @@ echo "INSTALANDO WO-CLI.."
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
-        /usr/local/bin/wo stack install --ngxblocker
         /usr/local/bin/wo stack upgrade --phpmyadmin
         
        
@@ -159,11 +158,6 @@ echo "INSTALANDO WO-CLI.."
         # download wp-cli bash-completion
         wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
  
-  
-        #Customize WordPress installation locale
-
-         cp -f $HOME/wo-install/etc/config.yml ~/.wp-cli/config.yml
-
     fi
 
     if [ ! -f /var/www/.profile ] && [ ! -f /var/www/.bashrc ]; then
@@ -179,14 +173,12 @@ echo "INSTALANDO WO-CLI.."
 ###
 
 
-
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
     
         cp -f $HOME/wo-install/etc/nginx/conf.d/upstream.conf /etc/nginx/conf.d/upstream.conf
         cp -f $HOME/wo-install/etc/nginx/sites-available/22222 /etc/nginx/sites-available/22222
-        #sed -i "s/memory_limit = 128M/memory_limit = 256M/" /etc/php/7.2/fpm/php.ini
-        #cp -f $HOME/wo-install/etc/php/7.3/fpm/php.ini /etc/php/7.3/fpm/php.ini
+
     fi
 ###
 
@@ -270,9 +262,6 @@ fi
 
     chmod +x $HOME/wo-install/var/www/nanorc.sh
     bash $HOME/wo-install/var/www/nanorc.sh
-
-    wget -O mysqldump.sh virtubox.net/mysqldump
-    chmod +x mysqldump.sh
 
 ###
 
