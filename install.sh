@@ -142,7 +142,9 @@ echo "INSTALANDO WO-CLI.."
     if [ -e /usr/local/bin/wo ]; then
 
         /usr/local/bin/wo stack install
+        /usr/local/bin/wo stack install --php74
         /usr/local/bin/wo stack upgrade --phpmyadmin
+        sed -i 's/version = 7.3/version = 7.4/' /etc/wo/wo.conf
         
        
     
@@ -189,6 +191,7 @@ echo "INSTALANDO WO-CLI.."
     cp -rf $HOME/wo-install/etc/fail2ban/jail.d/* /etc/fail2ban/jail.d/
 
     fail2ban-client reload
+    fail2ban-client restart
 
 ###Instalando Monit...
 if [ -f /usr/local/bin/monit ]; then
