@@ -193,6 +193,16 @@ echo "INSTALANDO WO-CLI.."
     fail2ban-client reload
     fail2ban-client restart
 
+    cp $HOME/wo-install/monit/monitreload.sh /usr/local/bin/monitreload
+    cp $HOME/wo-install/monit/monit2telegram/sendtelegram.sh /usr/local/bin/sendtelegram
+    chmod +x /usr/local/bin/sendtelegram
+    cp $HOME/wo-install/monit/monit2telegram/monit2telegram.sh /usr/local/bin/monit2telegram
+    chmod +x /usr/local/bin/monit2telegram
+    cp  $HOME/wo-install/monit/monit2telegram/telegramrc /etc/
+
+(crontab -l; echo "0 0 * * * bash /usr/local/bin/monitreload >> /var/log/monitreload.log /dev/null 2>&1") | crontab -
+
+
 ###Instalando Monit...
 if [ -f /usr/local/bin/monit ]; then
 
