@@ -58,13 +58,6 @@ echo -e "${CGREEN}
 # INSTALAÇÃO
 ##################################
 
-#adicionar swap
-    dd if=/dev/zero of=/var/swap bs=1k count=2048k
-    mkswap /var/swap
-    swapon /var/swap
-    echo '/var/swap swap swap defaults 0 0' | sudo tee -a /etc/fstab
-    free -m
-###
 
 ###Pacotes do Sistemas Atualizados
 
@@ -108,17 +101,8 @@ echo -e "${CGREEN}
 ###
 
 ### Instalando Rclone e wo-cli
-echo "INSTALANDO RCLONE..."
-    [ -e /usr/bin/rclone ] && echo "Rclone Existe ⚡️" || curl https://rclone.org/install.sh | sudo bash
 
-echo "INSTALANDO WO-CLI.."
-    [ -e /usr/local/bin/wo-cli ] && echo "wo-cli Existe ⚡️" || wget -O /usr/local/bin/wo-cli https://raw.githubusercontent.com/juanpvh/wo-cli/master/wo-cli.sh
- chmod +x /usr/local/bin/wo-cli
-
-#sed -i "s/BACKUPS=BK/BACKUPS=$USER/" /usr/local/bin/wo-cli
-
-(crontab -l; echo "0 2 * * * bash /usr/local/bin/wo-cli -b >> /var/log/wo-cli.log 2>&1") | crontab -
-###
+bash <(curl https://raw.githubusercontent.com/juanpvh/wo-cli/master/setup.sh)
 
 ################################################
 ###Instalação do WordOps
@@ -131,7 +115,7 @@ echo "INSTALANDO WO-CLI.."
     else
 
         wget -qO wo wops.cc && sudo bash wo
-        source /etc/bash_completion.d/wo_auto.rc
+        bash -l
         rm -rf wo
     
     fi
@@ -144,36 +128,12 @@ echo "INSTALANDO WO-CLI.."
         /usr/local/bin/wo stack install
         /usr/local/bin/wo stack install --php74
         /usr/local/bin/wo stack upgrade --phpmyadmin
-        sed -i 's/version = 7.3/version = 7.4/' /etc/wo/wo.conf
+        sed -i 's/version = .*/version = 7.3/' /etc/wo/wo.conf
         
        
     
     fi
 ###
-
-###Configurando adicionais acesso www-data shell
-
-    # change www-data shell
-    usermod -s /bin/bash www-data
-
-    if [ ! -f /etc/bash_completion.d/wp-completion.bash ]; then
-        # download wp-cli bash-completion
-        wget -qO /etc/bash_completion.d/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
- 
-    fi
-
-    if [ ! -f /var/www/.profile ] && [ ! -f /var/www/.bashrc ]; then
-        # create .profile & .bashrc for www-data user
-        cp -f $HOME/wo-install/var/www/.profile /var/www/.profile
-        cp -f $HOME/wo-install/var/www/.bashrc /var/www/.bashrc
-
-        # set www-data as owner
-        chown www-data:www-data /var/www/.profile
-        chown www-data:www-data /var/www/.bashrc
-    fi
-
-###
-
 
 ###Compilando a Pilha Nginx-ee
     if [ -f /usr/sbin/nginx ]; then
@@ -269,15 +229,6 @@ if [ -z "$(command -v rkhunter)" ]; then
 	
 fi
 
-
-
-###Instalando Nanorc...
-
-    chmod +x $HOME/wo-install/var/www/nanorc.sh
-    bash $HOME/wo-install/var/www/nanorc.sh
-
-###
-
 # download secure sshd_config
 sudo cp -f $HOME/wo-install/etc/sshd_config /etc/ssh/sshd_config
 
@@ -311,11 +262,23 @@ ufw allow 49000:50000/tcp
 ufw reload
 echo "y" | ufw enable
 
+
+#adicionar swap
+    dd if=/dev/zero of=/swap bs=1k count=2048k
+    mkswap /var/swap
+    swapon /var/swap
+    echo '/var/swap swap swap defaults 0 0' | sudo tee -a /etc/fstab
+    free -m
+###
+
+
 ###Limpando Instalação...
 
 apt-get -y autoremove php5.6-fpm php5.6-common --purge
 apt-get -y autoremove php7.0-fpm php7.0-common --purge
 apt-get -y autoremove php7.1-fpm php7.1-common --purge
+apt-get -y autoremove php7.2-fpm php7.2-common --purge
+apt-get -y autoremove php7.3-fpm php7.3-common --purge
 cd ~
 rm -rf wo-install nginx-build.sh wo-install-pack.sh
 
