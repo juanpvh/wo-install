@@ -107,7 +107,7 @@ bash <(curl https://raw.githubusercontent.com/juanpvh/wo-cli/master/setup.sh)
 ################################################
 ###Instalação do WordOps
 ###############################################
-
+{
     if [ -e /usr/local/bin/wo ]; then
 
         echo "WordOps Instalado"
@@ -119,7 +119,7 @@ bash <(curl https://raw.githubusercontent.com/juanpvh/wo-cli/master/setup.sh)
         rm -rf wo
     
     fi
-
+}
 ###
 
 ###Instalando Pack adicional do WordOps
@@ -128,7 +128,7 @@ bash <(curl https://raw.githubusercontent.com/juanpvh/wo-cli/master/setup.sh)
         /usr/local/bin/wo stack install
         /usr/local/bin/wo stack install --php74
         /usr/local/bin/wo stack upgrade --phpmyadmin
-        sed -i 's/version = .*/version = 7.3/' /etc/wo/wo.conf
+        sed -i 's/version = .*/version = 7.4/' /etc/wo/wo.conf
         
        
     
