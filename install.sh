@@ -119,7 +119,7 @@ bash <(curl https://raw.githubusercontent.com/juanpvh/wo-cli/master/setup.sh)
         rm -rf wo
     
     fi
-}
+} > /dev/null
 ###
 
 ###Instalando Pack adicional do WordOps
