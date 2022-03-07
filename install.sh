@@ -265,9 +265,9 @@ echo "y" | ufw enable
 
 #adicionar swap
     dd if=/dev/zero of=/swap bs=1k count=2048k
-    mkswap /var/swap
-    swapon /var/swap
-    echo '/var/swap swap swap defaults 0 0' | sudo tee -a /etc/fstab
+    mkswap /swap
+    swapon /swap
+    echo '/swap swap swap defaults 0 0' | sudo tee -a /etc/fstab
     free -m
 ###
 
